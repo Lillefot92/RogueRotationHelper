@@ -96,6 +96,9 @@ This build targets official MoP Classic 5.5.4 / Interface 50504.
    Combo Points, key timers, and poison state are available in the tooltip.
 4. Confirm a gold border/icon means pool, red means range or poison attention,
    and teal means the recommendation is ready.
+5. Hover the recommendation icon, then hover bag items, equipped gear, spells,
+   and action buttons. Confirm their normal tooltips remain visible and are not
+   replaced or hidden by the addon.
 
 ## Dungeon or raid checks
 

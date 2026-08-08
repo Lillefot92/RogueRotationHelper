@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0-beta.2
+
+- Fixed normal item, equipment, spell, and action tooltips disappearing while
+  Rogue Rotation Helper was enabled.
+- The live recommendation tooltip now refreshes or hides only while the addon
+  still owns WoW's shared `GameTooltip`; it can no longer reclaim or close a
+  tooltip opened by another UI element.
+- Added a regression test covering both tooltip takeover and addon hiding while
+  an item tooltip is visible.
+
 ## 0.1.0-beta.1
 
 - Promoted Combat to beta after level-90 single-target dummy and live dungeon

@@ -91,6 +91,13 @@ local function ModeLabel(state)
     return "Forced " .. requested
 end
 
+local function TooltipIsOwnedBy(owner)
+    if not owner or not GameTooltip then return false end
+    if GameTooltip.IsOwned then return GameTooltip:IsOwned(owner) end
+    if GameTooltip.GetOwner then return GameTooltip:GetOwner() == owner end
+    return false
+end
+
 local function ShowTooltip(owner)
     GameTooltip:SetOwner(owner, "ANCHOR_TOP")
     if GameTooltip.ClearLines then GameTooltip:ClearLines() end
@@ -162,9 +169,9 @@ local function ShowTooltip(owner)
     tooltipLastRefresh = GetTime()
 end
 
-local function HideTooltip()
+local function HideTooltip(owner)
     tooltipVisible = false
-    GameTooltip:Hide()
+    if TooltipIsOwnedBy(owner or frame) then GameTooltip:Hide() end
 end
 
 function ns.Display_Create()
@@ -410,6 +417,10 @@ function ns.Display_Update(liveState, liveDecision)
     UpdateCooldownColumn(state, preview)
     UpdateGlow(decision, preview)
     if tooltipVisible and GetTime() - tooltipLastRefresh >= 0.20 then
-        ShowTooltip(frame)
+        if TooltipIsOwnedBy(frame) then
+            ShowTooltip(frame)
+        else
+            tooltipVisible = false
+        end
     end
 end

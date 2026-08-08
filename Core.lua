@@ -8,7 +8,7 @@
 
 local ADDON_NAME, ns = ...
 
-ns.VERSION = "0.1.0-beta.1"
+ns.VERSION = "0.1.0-beta.2"
 ns.INTERFACE = 50504
 ns.ROGUE_CLASS_FILE = "ROGUE"
 ns.COMBAT_SPEC_ID = 260

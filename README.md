@@ -10,7 +10,7 @@ targets a unit, sends chat, or automates gameplay.
 
 ## Download the public beta
 
-Download `RogueRotationHelper-0.1.0-beta.1.zip` from the official
+Download `RogueRotationHelper-0.1.0-beta.2.zip` from the official
 [GitHub Releases page](https://github.com/Lillefot92/RogueRotationHelper/releases).
 The release ZIP contains only readable Lua source and documentation. Do not
 install similarly named executables or third-party installers.
