@@ -1,5 +1,9 @@
 # Rogue Rotation Helper
 
+<p align="center">
+  <img src="docs/images/rogue-rotation-helper-logo.png" alt="Rogue Rotation Helper logo" width="220">
+</p>
+
 Rogue Rotation Helper is a transparent, recommendation-only PvE addon for
 Rogues in **World of Warcraft: Mists of Pandaria Classic**. This beta targets
 the official **5.5.4 client (Interface 50504)** and currently supports the
@@ -22,6 +26,16 @@ it is not required for general dungeon and dummy feedback.
 Found a problem? Use the public
 [issue tracker](https://github.com/Lillefot92/RogueRotationHelper/issues) so the
 report and its eventual fix remain visible to everyone.
+
+## Screenshots
+
+### Compact combat display
+
+![Rogue Rotation Helper showing its main recommendation and side cooldown icons](docs/images/compact-combat-display.png)
+
+### In-game settings
+
+![Rogue Rotation Helper settings panel](docs/images/in-game-settings.png)
 
 ## What the Combat beta includes
 
