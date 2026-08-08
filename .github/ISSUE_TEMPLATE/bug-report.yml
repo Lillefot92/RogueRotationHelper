@@ -1,0 +1,47 @@
+name: Beta bug report
+description: Report a rotation, display, or compatibility problem
+title: "[Beta] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for testing Rogue Rotation Helper. Never include account credentials or private chat.
+  - type: input
+    id: addon-version
+    attributes:
+      label: Addon version
+      description: Enter the version shown by /rrh status.
+      placeholder: 0.1.0-beta.1
+    validations:
+      required: true
+  - type: input
+    id: client-build
+    attributes:
+      label: WoW client build
+      description: Enter the build shown on the login screen.
+    validations:
+      required: true
+  - type: dropdown
+    id: target-mode
+    attributes:
+      label: Target mode
+      options:
+        - Auto
+        - Single target
+        - Cleave
+        - AoE
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the expected and actual recommendation, Energy, Combo Points, and relevant timers.
+    validations:
+      required: true
+  - type: textarea
+    id: errors
+    attributes:
+      label: Lua error or supporting media
+      description: Paste the complete Lua error, or attach a screenshot or short clip.
