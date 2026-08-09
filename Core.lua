@@ -8,10 +8,18 @@
 
 local ADDON_NAME, ns = ...
 
-ns.VERSION = "0.1.0-beta.2"
+ns.VERSION = "0.2.0-alpha.2"
 ns.INTERFACE = 50504
 ns.ROGUE_CLASS_FILE = "ROGUE"
+ns.ASSASSINATION_SPEC_ID = 259
 ns.COMBAT_SPEC_ID = 260
+ns.SUBTLETY_SPEC_ID = 261
+
+ns.SPEC_NAMES = {
+    [ns.ASSASSINATION_SPEC_ID] = "Assassination",
+    [ns.COMBAT_SPEC_ID] = "Combat",
+    [ns.SUBTLETY_SPEC_ID] = "Subtlety",
+}
 
 local ENERGY_POWER_TYPE = (Enum and Enum.PowerType and Enum.PowerType.Energy) or 3
 local COMBO_POWER_TYPE = (Enum and Enum.PowerType and Enum.PowerType.ComboPoints) or 4
@@ -24,6 +32,11 @@ ns.ABILITIES = {
     LEECHING_POISON   = { id = 108211, cost = 0 },
     PARALYTIC_POISON  = { id = 108215, cost = 0 },
     AMBUSH            = { id = 8676,   cost = 60, target = true },
+    MUTILATE          = { id = 1329,   cost = 55, target = true },
+    DISPATCH          = { id = 111240, cost = 30, target = true },
+    ENVENOM           = { id = 32645,  cost = 35, target = true },
+    VENDETTA          = { id = 79140,  cost = 0,  target = true },
+    PREPARATION       = { id = 14185,  cost = 0 },
     SLICE_AND_DICE    = { id = 5171,   cost = 25 },
     REVEALING_STRIKE  = { id = 84617,  cost = 40, target = true },
     SINISTER_STRIKE   = { id = 1752,   cost = 50, target = true },
@@ -60,6 +73,9 @@ ns.AURAS = {
     ANTICIPATION       = 115189,
     ANTICIPATION_LEGACY = 114015,
     SUBTERFUGE         = 115192,
+    BLINDSIDE          = 121153,
+    ENVENOM            = 32645,
+    VENDETTA           = 79140,
     KIDNEY_SHOT        = 408,
     SHALLOW_INSIGHT    = 84745,
     MODERATE_INSIGHT   = 84746,
@@ -101,6 +117,12 @@ ns.CONFIG = {
     MELEE_RANGE_SPELL = 1752,
     CLEAVE_THRESHOLD = 2,
     AOE_THRESHOLD = 8,
+    ASSASSINATION_AOE_THRESHOLD = 4,
+    ASSASSINATION_MASS_AOE_THRESHOLD = 9,
+    ASSASSINATION_RUPTURE_MULTI_CP = 3,
+    ASSASSINATION_ENVENOM_POOL = 80,
+    ASSASSINATION_RUPTURE_MIN_TTD = 8,
+    ASSASSINATION_VENDETTA_MIN_TTD = 20,
     SND_EMERGENCY = 1.5,
     SND_FIVE_CP_REFRESH = 3.0,
     RVS_REFRESH = 3.0,
@@ -119,7 +141,9 @@ ns.state = {
     playerLevel = 0,
     isRogue = false,
     specID = 0,
+    isAssassinationSpec = false,
     isCombatSpec = false,
+    isSupportedSpec = false,
     inCombat = false,
     inRaid = false,
     energy = 0,
@@ -150,6 +174,9 @@ ns.state = {
     sndRemaining = 0,
     rvsRemaining = 0,
     ruptureRemaining = 0,
+    envenomRemaining = 0,
+    vendettaRemaining = 0,
+    blindside = false,
     deadlyPoisonRemaining = 0,
     utilityPoisonRemaining = 0,
     utilityPoisonKey = nil,
@@ -256,6 +283,14 @@ function ns.GetAbilityIcon(key)
     local ability = ns.ABILITIES[key]
     local info = ability and ns.GetSpellInfo(ability.id)
     return info and info.iconID or 134400
+end
+
+function ns.GetSpecName(specID)
+    return ns.SPEC_NAMES[specID] or "Unsupported"
+end
+
+function ns.IsSupportedSpec(specID)
+    return specID == ns.ASSASSINATION_SPEC_ID or specID == ns.COMBAT_SPEC_ID
 end
 
 function ns.PlayerKnowsSpell(spellID)
@@ -606,11 +641,15 @@ local function RefreshInsight(now)
     ns.state.insightRemaining = AuraRemaining(aura, now)
 end
 
-function ns.ResolveMode(requestedMode, enemyCount)
+function ns.ResolveMode(requestedMode, enemyCount, specID)
     if requestedMode == "single" then return "single" end
     if requestedMode == "cleave" then return "cleave" end
     if requestedMode == "aoe" then return "aoe" end
-    if enemyCount >= ns.CONFIG.AOE_THRESHOLD then return "aoe" end
+    local aoeThreshold = ns.CONFIG.AOE_THRESHOLD
+    if specID == ns.ASSASSINATION_SPEC_ID then
+        aoeThreshold = ns.CONFIG.ASSASSINATION_AOE_THRESHOLD or 4
+    end
+    if enemyCount >= aoeThreshold then return "aoe" end
     if enemyCount >= ns.CONFIG.CLEAVE_THRESHOLD then return "cleave" end
     return "single"
 end
@@ -624,7 +663,9 @@ function ns.RefreshState()
     local _, classFile = UnitClass("player")
     s.isRogue = classFile == ns.ROGUE_CLASS_FILE
     s.specID = GetSpecID()
+    s.isAssassinationSpec = s.isRogue and s.specID == ns.ASSASSINATION_SPEC_ID
     s.isCombatSpec = s.isRogue and s.specID == ns.COMBAT_SPEC_ID
+    s.isSupportedSpec = s.isRogue and ns.IsSupportedSpec(s.specID)
     s.inCombat = UnitAffectingCombat("player") == true
     s.inRaid = IsInRaid and IsInRaid() == true
     s.energy = UnitPower("player", ENERGY_POWER_TYPE) or 0
@@ -657,8 +698,9 @@ function ns.RefreshState()
     s.targetIsBoss = s.targetExists
         and (classification == "worldboss" or (UnitLevel("target") or 0) == -1)
     s.targetTTD = EstimateTargetTTD(s.targetGUID, s.targetHealth, now, s.targetIsBoss)
+    local meleeAbility = s.isAssassinationSpec and "MUTILATE" or "SINISTER_STRIKE"
     s.meleeRange = s.targetAttackable
-        and ns.IsAbilityInRange("SINISTER_STRIKE", "target") or false
+        and ns.IsAbilityInRange(meleeAbility, "target") or false
     s.shurikenRange = s.targetAttackable
         and ns.IsAbilityInRange("SHURIKEN_TOSS", "target") or false
 
@@ -666,6 +708,9 @@ function ns.RefreshState()
     local snd = ns.FindAura("player", ns.AURAS.SLICE_AND_DICE, "HELPFUL")
     local rvs = ns.FindAura("target", ns.AURAS.REVEALING_STRIKE, "HARMFUL", true)
     local rupture = ns.FindAura("target", ns.AURAS.RUPTURE, "HARMFUL", true)
+    local envenom = ns.FindAura("player", ns.AURAS.ENVENOM, "HELPFUL")
+    local vendetta = ns.FindAura("target", ns.AURAS.VENDETTA, "HARMFUL", true)
+    local blindside = ns.FindAura("player", ns.AURAS.BLINDSIDE, "HELPFUL")
     local bladeFlurry = ns.FindAura("player", ns.AURAS.BLADE_FLURRY, "HELPFUL")
     local adrenalineRush = ns.FindAura("player", ns.AURAS.ADRENALINE_RUSH, "HELPFUL")
     local shadowBlades = ns.FindAura("player", ns.AURAS.SHADOW_BLADES, "HELPFUL")
@@ -698,16 +743,26 @@ function ns.RefreshState()
     s.sndRemaining = AuraRemaining(snd, now)
     s.rvsRemaining = AuraRemaining(rvs, now)
     s.ruptureRemaining = AuraRemaining(rupture, now)
+    s.envenomRemaining = AuraRemaining(envenom, now)
+    s.vendettaRemaining = AuraRemaining(vendetta, now)
+    s.blindside = blindside ~= nil
     s.bladeFlurry = bladeFlurry ~= nil
     s.adrenalineRush = adrenalineRush ~= nil
     s.shadowBlades = shadowBlades ~= nil
     s.killingSpree = killingSpree ~= nil
     s.kidneyShotRemaining = AuraRemaining(kidneyShot, now)
 
-    RefreshInsight(now)
+    if s.isCombatSpec then
+        RefreshInsight(now)
+    else
+        s.insight = 0
+        s.insightName = "None"
+        s.insightRemaining = 0
+        s.insightProgress = 0
+    end
     RefreshCooldowns()
     s.enemyCount = ns.CountNearbyEnemies()
-    s.mode = ns.ResolveMode(ns.db and ns.db.mode or "auto", s.enemyCount)
+    s.mode = ns.ResolveMode(ns.db and ns.db.mode or "auto", s.enemyCount, s.specID)
     return s
 end
 
@@ -725,6 +780,9 @@ local AREA_CAST_SPELLS = {
 }
 local NEARBY_DAMAGE_SPELLS = {
     [ns.ABILITIES.AMBUSH.id] = true,
+    [ns.ABILITIES.MUTILATE.id] = true,
+    [ns.ABILITIES.DISPATCH.id] = true,
+    [ns.ABILITIES.ENVENOM.id] = true,
     [ns.ABILITIES.REVEALING_STRIKE.id] = true,
     [ns.ABILITIES.SINISTER_STRIKE.id] = true,
     [ns.ABILITIES.EVISCERATE.id] = true,
@@ -926,6 +984,7 @@ local function SlashHandler(text)
         if ns.Simulator_PrintSelfCheck then ns.Simulator_PrintSelfCheck() end
     elseif command == "status" then
         ns.Print("v" .. ns.VERSION .. ", level=" .. tostring(ns.state.playerLevel or 0)
+            .. ", spec=" .. ns.GetSpecName(ns.state.specID)
             .. ", mode=" .. ns.db.mode
             .. ", active=" .. tostring(ns.state.mode or "single")
             .. ", targets=" .. tostring(ns.state.enemyCount or 1)

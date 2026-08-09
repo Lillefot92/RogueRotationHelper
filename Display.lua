@@ -8,6 +8,7 @@ local ADDON_NAME, ns = ...
 local frame
 local iconTexture
 local primaryCooldown
+local poolEnergyText
 local unlockedText
 local cooldownEntries = {}
 local actionButtons = {}
@@ -84,7 +85,8 @@ end
 
 local function ModeLabel(state)
     local requested = ns.db.mode or "auto"
-    local resolved = state.mode or ns.ResolveMode(requested, state.enemyCount or 1)
+    local resolved = state.mode or ns.ResolveMode(requested,
+        state.enemyCount or 1, state.specID)
     if requested == "auto" then
         return "Auto / " .. resolved
     end
@@ -119,6 +121,9 @@ local function ShowTooltip(owner)
                 ModeLabel(lastState) .. " / " .. tostring(lastState.enemyCount or 1),
                 0.65, 0.70, 0.78, 1, 1, 1)
         end
+        GameTooltip:AddDoubleLine("Specialization",
+            ns.GetSpecName(lastState.specID),
+            0.65, 0.70, 0.78, 1, 1, 1)
         local combo = tostring(lastState.comboPoints or 0)
         if (lastState.anticipation or 0) > 0 then
             combo = combo .. "+" .. tostring(lastState.anticipation)
@@ -126,11 +131,23 @@ local function ShowTooltip(owner)
         GameTooltip:AddDoubleLine("Energy / Combo Points",
             tostring(lastState.energy or 0) .. " / " .. combo,
             0.65, 0.70, 0.78, 1, 1, 1)
-        GameTooltip:AddDoubleLine("SnD / RvS / Rupture",
-            string.format("%.1f / %.1f / %.1f",
-                lastState.sndRemaining or 0, lastState.rvsRemaining or 0,
-                lastState.ruptureRemaining or 0),
-            0.65, 0.70, 0.78, 1, 1, 1)
+        if lastState.specID == ns.ASSASSINATION_SPEC_ID then
+            GameTooltip:AddDoubleLine("SnD / Rupture / Envenom",
+                string.format("%.1f / %.1f / %.1f",
+                    lastState.sndRemaining or 0, lastState.ruptureRemaining or 0,
+                    lastState.envenomRemaining or 0),
+                0.65, 0.70, 0.78, 1, 1, 1)
+            GameTooltip:AddDoubleLine("Vendetta / Blindside",
+                string.format("%.1f / %s", lastState.vendettaRemaining or 0,
+                    lastState.blindside and "active" or "inactive"),
+                0.65, 0.70, 0.78, 1, 1, 1)
+        else
+            GameTooltip:AddDoubleLine("SnD / RvS / Rupture",
+                string.format("%.1f / %.1f / %.1f",
+                    lastState.sndRemaining or 0, lastState.rvsRemaining or 0,
+                    lastState.ruptureRemaining or 0),
+                0.65, 0.70, 0.78, 1, 1, 1)
+        end
         if not lastState.poisonsReady then
             GameTooltip:AddLine("Poisons need attention", 1.0, 0.30, 0.24)
         end
@@ -196,6 +213,14 @@ function ns.Display_Create()
     primaryCooldown:SetDrawEdge(false)
     primaryCooldown:SetHideCountdownNumbers(false)
 
+    poolEnergyText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    poolEnergyText:SetPoint("BOTTOMRIGHT", iconTexture, "BOTTOMRIGHT", -5, 5)
+    poolEnergyText:SetTextColor(1.0, 0.76, 0.30)
+    poolEnergyText:SetShadowColor(0, 0, 0, 1)
+    poolEnergyText:SetShadowOffset(1, -1)
+    poolEnergyText:Hide()
+    frame.poolEnergyText = poolEnergyText
+
     unlockedText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     unlockedText:SetPoint("BOTTOM", frame, "TOP", 0, 4)
     unlockedText:SetText("DRAG")
@@ -203,7 +228,9 @@ function ns.Display_Create()
 
     CreateCooldownEntry(frame, "KILLING_SPREE")
     CreateCooldownEntry(frame, "ADRENALINE_RUSH")
+    CreateCooldownEntry(frame, "VENDETTA")
     CreateCooldownEntry(frame, "SHADOW_BLADES")
+    CreateCooldownEntry(frame, "VANISH")
 
     frame:SetScript("OnDragStart", function(self)
         if ns.db and not ns.db.locked then self:StartMoving() end
@@ -314,9 +341,13 @@ end
 local function UpdateCooldownColumn(state, preview)
     local visibleEntries = {}
     local show = ns.db.showCooldownRow ~= false
+    local allowed = {}
+    for _, key in ipairs(ns.Rotation_GetCooldownKeys(state.specID)) do
+        allowed[key] = true
+    end
     for _, entry in ipairs(cooldownEntries) do
         local known = not state.known or state.known[entry.key] ~= false
-        local visible = show and known
+        local visible = show and known and allowed[entry.key] == true
         entry:SetShown(visible)
         if visible then visibleEntries[#visibleEntries + 1] = entry end
     end
@@ -352,6 +383,13 @@ end
 
 local function UpdatePrimaryAppearance(decision)
     local color = COLORS.ready
+    local poolThreshold = decision.poolTo or decision.cost or 0
+    if decision.pool and poolThreshold > 0 then
+        poolEnergyText:SetText(tostring(math.floor(poolThreshold + 0.5)))
+        poolEnergyText:Show()
+    else
+        poolEnergyText:Hide()
+    end
     if decision.pool then
         iconTexture:SetDesaturated(true)
         iconTexture:SetVertexColor(1.0, 0.73, 0.32)
@@ -389,7 +427,8 @@ function ns.Display_Update(liveState, liveDecision)
         state.mode = "single"
     end
 
-    if not ns.db.enabled or (not preview and (not state.isRogue or not state.isCombatSpec)) then
+    if not ns.db.enabled or (not preview
+        and (not state.isRogue or not state.isSupportedSpec)) then
         frame:Hide()
         HideTooltip()
         ns.Display_HideGlow()

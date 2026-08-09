@@ -1,7 +1,8 @@
 # Contributing and beta feedback
 
-Thank you for helping test Rogue Rotation Helper. The current public beta
-focuses on level-90 Combat Rogue PvE in Mists of Pandaria Classic 5.5.4.
+Thank you for helping test Rogue Rotation Helper. The public beta focuses on
+level-90 Combat Rogue PvE; the current pre-release also contains an external
+Assassination alpha for Mists of Pandaria Classic 5.5.4.
 
 ## Before reporting a rotation problem
 
@@ -13,7 +14,7 @@ focuses on level-90 Combat Rogue PvE in Mists of Pandaria Classic 5.5.4.
 
 ## What to include
 
-- addon version and game client build;
+- addon version, active specialization, and game client build;
 - single, cleave, or AoE mode and cooldown policy;
 - expected recommendation and actual recommendation;
 - Energy, Combo Points, and relevant visible timers;
@@ -26,4 +27,3 @@ especially useful.
 
 Open feedback at:
 https://github.com/Lillefot92/RogueRotationHelper/issues
-

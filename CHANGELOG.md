@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.2.0-alpha.2
+
+- Added a small Energy target on the main icon while an ability is being
+  pooled. For example, pooled Envenom now shows `80`; the number disappears
+  immediately when the recommendation becomes ready.
+- Kept the normal display icon-only outside pooling and retained the existing
+  gold, teal, and red status colors.
+- Completed the first level-90 Assassination live pass: single target,
+  Blindside and execute Dispatch, pooled Envenom, four-plus-target Fan of
+  Knives/Rupture behavior, automatic target-mode changes, and tooltip safety.
+- Confirmed live Assassination-to-Combat switching without a UI reload. The
+  recommendation and cooldown column change cleanly with no cross-spec icons.
+- Nine-or-more-target and dungeon/raid behavior remain external-alpha checks.
+
+## 0.2.0-alpha.1
+
+- Added a spec-aware rotation dispatcher while preserving all 56 validated
+  Combat decisions as regression checks.
+- Added the first Assassination evaluator: Mutilate opener, Slice and Dice,
+  Rupture, pooled Envenom, Blindside/execute Dispatch, Marked for Death,
+  Vendetta, Shadow Blades, optional Vanish/Preparation, and ranged fallbacks.
+- Added separate Assassination behavior for two-to-three, four-to-eight, and
+  nine-or-more targets based on current Phase 5 guidance.
+- Added automatic live switching between Combat and Assassination without a UI
+  reload.
+- Made the icon tooltip, settings status, preview, and side cooldown column
+  specialization-aware.
+- Expanded the deterministic rotation suite from 56 to 87 scenarios and added
+  a mocked live Combat-to-Assassination switching test.
+- Kept Subtlety safely disabled until its own evaluator is implemented.
+
 ## 0.1.0-beta.2
 
 - Fixed normal item, equipment, spell, and action tooltips disappearing while

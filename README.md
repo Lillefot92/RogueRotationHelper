@@ -5,9 +5,9 @@
 </p>
 
 Rogue Rotation Helper is a transparent, recommendation-only PvE addon for
-Rogues in **World of Warcraft: Mists of Pandaria Classic**. This beta targets
-the official **5.5.4 client (Interface 50504)** and currently supports the
-**Combat** specialization.
+Rogues in **World of Warcraft: Mists of Pandaria Classic**. It targets the
+official **5.5.4 client (Interface 50504)** and currently supports **Combat**
+in public beta plus **Assassination** as an external alpha.
 
 The addon shows what to press next. It never casts a spell, presses a key,
 targets a unit, sends chat, or automates gameplay.
@@ -22,6 +22,12 @@ install similarly named executables or third-party installers.
 Combat has passed level-90 single-target dummy and live dungeon testing. The
 remaining beta item is boss-specific cooldown validation on a live raid boss;
 it is not required for general dungeon and dummy feedback.
+
+Version `0.2.0-alpha.2` adds the first Assassination module without changing
+the validated Combat priorities. It has passed its first level-90 live dummy
+pass and is intended for a small external test. While Energy is being pooled,
+the main icon shows the required Energy number and removes it as soon as the
+recommendation is ready.
 
 Found a problem? Use the public
 [issue tracker](https://github.com/Lillefot92/RogueRotationHelper/issues) so the
@@ -41,7 +47,7 @@ report and its eventual fix remain visible to everyone.
 
 - A clean, large next-action icon; mouse over it for the recommendation reason
   and detailed state.
-- Energy pooling and out-of-range warnings.
+- Energy pooling with a compact target number, plus out-of-range warnings.
 - Energy, Combo Points, Slice and Dice, Revealing Strike, Rupture, target mode,
   target count, and poison status in the mouseover tooltip.
 - Larger, vertically stacked Killing Spree, Adrenaline Rush, and Shadow Blades
@@ -65,14 +71,31 @@ report and its eventual fix remain visible to everyone.
   choices, Deadly Throw while disconnected, talented poisons, and optional
   Prey on the Weak advice for stunnable enemies.
 
+## What the Assassination alpha includes
+
+- Automatic specialization detection and a separate Assassination evaluator;
+  switching specs does not require reloading or changing a setting.
+- Mutilate from Stealth, Blindside and execute-phase Dispatch, Slice and Dice,
+  Rupture, pooled Envenom, and Marked for Death priorities.
+- Vendetta and Shadow Blades pairing, plus disabled-by-default offensive Vanish
+  and Preparation advice.
+- Two-to-three target Rupture spreading, four-to-eight target Fan of Knives
+  and 3+ point Rupture behavior, and a nine-or-more target Envenom/Fan of
+  Knives priority.
+- Assassination-specific hover details and Vendetta, Shadow Blades, and Vanish
+  side cooldown icons.
+- Shared poison, range, target-counting, talent, action-bar glow, and settings
+  support from the Combat beta.
+
 ## Level-aware and level-90 talent support
 
 The helper does not assume that the Rogue is level 90. Unlearned abilities are
 removed from the priority automatically. At level 86 it runs the complete
-available Combat rotation without asking for a level-90 talent.
+available supported rotation without asking for a level-90 talent.
 
-- Nightstalker and Shadow Focus use the normal Ambush opener and the live
-  in-game Energy cost. Subterfuge's extended Stealth window is recognized.
+- Combat uses Ambush from Stealth; Assassination uses Mutilate. Nightstalker,
+  Shadow Focus, live in-game Energy costs, and Subterfuge's extended Stealth
+  window are recognized.
 - Deadly Throw can preserve damage when a talented Rogue is forced out of
   melee range.
 - Leeching Poison and Paralytic Poison are recognized as selected non-lethal
@@ -86,7 +109,7 @@ available Combat rotation without asking for a level-90 talent.
 - At level 90, the panel reports the selected final-row talent. Shadow Blades
   is learned and automatically joins the side cooldown column.
 
-## Current Phase 5 rotation model
+## Current Phase 5 Combat rotation model
 
 The priority is specifically built for the current 5.5.4 rules, rather than an
 older launch-version MoP rotation.
@@ -117,6 +140,30 @@ open-source WoWSims MoP Combat Rogue implementation/APL:
 - https://github.com/wowsims/mop/tree/master/sim/rogue/combat
 - https://github.com/wowsims/mop/blob/master/ui/rogue/combat/apls/combat.apl.json
 
+## Assassination alpha rotation model
+
+1. Apply Deadly Poison and the selected non-lethal poison before combat.
+2. Open with Mutilate from Stealth.
+3. Establish Slice and Dice manually, then refresh it through Envenom and Cut
+   to the Chase.
+4. Keep Rupture active, prioritizing uptime over waiting for a perfect
+   five-point refresh.
+5. Pair Vendetta and Shadow Blades after Slice and Dice and Rupture are active.
+6. Use Blindside Dispatch procs and replace Mutilate with Dispatch below 35%.
+7. Pool Energy before five-point Envenoms when maintenance timers are safe.
+8. At two to three targets, spread Rupture and otherwise use the normal
+   single-target priority.
+9. At four to eight targets, build with Fan of Knives and apply 3+ point
+   Ruptures to current targets.
+10. At nine or more targets, build with Fan of Knives and spend on Envenom so
+    Deadly Poison supplies most of the AoE damage.
+
+The alpha is cross-checked against the current Phase 5 guide and the open-source
+WoWSims MoP Assassination APL:
+
+- https://www.wowhead.com/mop-classic/guide/classes/rogue/assassination/dps-rotation-cooldowns-abilities-pve
+- https://github.com/wowsims/mop/blob/master/ui/rogue/assassination/apls/assassination.apl.json
+
 ## Installation
 
 1. Exit World of Warcraft.
@@ -128,7 +175,7 @@ open-source WoWSims MoP Combat Rogue implementation/APL:
 4. Confirm the final path is:
    `Interface/AddOns/RogueRotationHelper/RogueRotationHelper.toc`
 5. Start MoP Classic and enable **Rogue Rotation Helper** on the AddOns screen.
-6. On a Combat Rogue, enter `/rrh test` to preview the display.
+6. On a Combat or Assassination Rogue, enter `/rrh test` to preview the display.
 7. Enter `/rrh sim`; all rotation checks should pass.
 
 ## Commands
@@ -187,6 +234,12 @@ complete verification and reuse terms.
   builder hits and can briefly desynchronize after reloads or unusual events.
 - Encounter-specific cooldown holds and defensive/utility prompts are not yet
   included.
-- Assassination and Subtlety modules come after Combat is validated.
+- Assassination has passed level-90 single-target, execute, four-to-eight
+  target, automatic-mode, and specialization-switching checks. Nine-or-more
+  targets and dungeon/raid behavior remain external-alpha validation items.
+- The addon sees Rupture only on the current target. It can explain when to
+  spread Rupture but cannot select or identify the next unruptured enemy.
+- Subtlety remains unsupported and is planned after Assassination validation.
 
-See `TESTING.md` for the remaining Combat validation checks.
+See `TESTING.md` for the remaining Combat checks and the Assassination alpha
+test pass.

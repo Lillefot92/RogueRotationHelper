@@ -1,4 +1,4 @@
-# Combat beta test pass
+# Combat beta and Assassination alpha test pass
 
 This build targets official MoP Classic 5.5.4 / Interface 50504.
 
@@ -96,11 +96,70 @@ This build targets official MoP Classic 5.5.4 / Interface 50504.
    Combo Points, key timers, and poison state are available in the tooltip.
 4. Confirm a gold border/icon means pool, red means range or poison attention,
    and teal means the recommendation is ready.
-5. Hover the recommendation icon, then hover bag items, equipped gear, spells,
+5. While pooling, confirm the required Energy number appears at the lower-right
+   of the main icon and disappears immediately when the icon becomes ready.
+6. Hover the recommendation icon, then hover bag items, equipped gear, spells,
    and action buttons. Confirm their normal tooltips remain visible and are not
    replaced or hidden by the addon.
 
-## Dungeon or raid checks
+## Assassination alpha checks
+
+Live validation completed for level-90 single target, Blindside and execute
+Dispatch, pooled Envenom, four-plus-target Fan of Knives/Rupture behavior,
+automatic mode changes, tooltip safety, and switching back to Combat without a
+UI reload. Nine-or-more targets and dungeon/raid behavior remain open checks.
+
+### Specialization switching and display
+
+1. Switch from Combat to Assassination without reloading the UI.
+2. Confirm `/rrh status` reports `spec=Assassination` and the settings panel
+   says **Assassination Rogue**.
+3. Confirm the side icons change to Vendetta, Shadow Blades, and Vanish; Killing
+   Spree and Adrenaline Rush must disappear.
+4. Mouse over the main icon and confirm it shows Slice and Dice, Rupture,
+   Envenom, Vendetta, and Blindside state instead of Combat's Revealing Strike
+   and Insight details.
+5. Enter `/rrh sim` and confirm all 87 rotation checks pass.
+
+### Assassination single target and execute
+
+1. Set `/rrh mode single` and `/rrh cooldowns off`.
+2. Enter Stealth and confirm Mutilate—not Ambush—is recommended.
+3. Confirm Slice and Dice is established manually, then refreshed by Envenom.
+4. Confirm Rupture is established quickly and refreshed before it expires.
+5. At 5 Combo Points with safe maintenance timers, confirm the Envenom icon
+   turns gold and shows `80`, then removes the number and becomes teal at
+   80 Energy.
+6. Confirm a Blindside proc changes the builder to Dispatch above 35% health.
+7. On a target below 35%, confirm Dispatch replaces Mutilate.
+8. Set `/rrh cooldowns on`; confirm Vendetta waits for Slice and Dice and
+   Rupture, then Shadow Blades follows during Vendetta.
+9. Enable `/rrh vanish on`; confirm Vanish is followed by Mutilate and that
+   Preparation can be suggested after Vanish is on cooldown. Turn the option
+   back off after this check if you do not want situational Vanish advice.
+
+### Assassination multi-target
+
+1. At two to three targets, confirm the helper uses the normal builder and asks
+   for Rupture on a current target that does not already have it.
+2. At four to eight targets, confirm Fan of Knives builds Combo Points and a
+   3+ point Rupture is recommended on an uncovered current target.
+3. The addon cannot select the next unruptured target. Switch targets manually
+   when spreading Rupture and report any misleading recommendation.
+4. At nine or more targets, confirm Fan of Knives builds and Envenom spends;
+   missing Rupture should no longer block this mass-AoE branch.
+5. Let the pull shrink through nine, four, two, and one target and confirm the
+   automatic mode and builder change without stale recommendations.
+
+### Regression back to Combat
+
+1. Switch back to Combat without reloading.
+2. Confirm Killing Spree, Adrenaline Rush, and Shadow Blades return to the side
+   column and `/rrh status` reports `spec=Combat`.
+3. Repeat a short single-target sequence and confirm Revealing Strike remains
+   the normal builder and no Assassination-only spell is recommended.
+
+## Combat dungeon or raid checks
 
 - Live dungeon validation passed for the automatic transition from 18-target
   AoE to 5-target cleave, with live tooltip state and no visible Lua errors.
@@ -113,6 +172,9 @@ This build targets official MoP Classic 5.5.4 / Interface 50504.
 - Treat every Killing Spree recommendation as conditional on safe positioning.
 - Watch for display flicker, stale auras after target swaps, wrong range state,
   or an action-bar glow that remains after combat.
+- Assassination has passed its first live dummy and specialization-switching
+  pass. Use external-alpha feedback to validate nine-or-more targets and live
+  dungeon/raid behavior.
 
 ## Useful feedback
 
