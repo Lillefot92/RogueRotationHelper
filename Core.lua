@@ -8,7 +8,7 @@
 
 local ADDON_NAME, ns = ...
 
-ns.VERSION = "0.3.0-alpha.1"
+ns.VERSION = "0.3.0-alpha.2"
 ns.INTERFACE = 50504
 ns.ROGUE_CLASS_FILE = "ROGUE"
 ns.ASSASSINATION_SPEC_ID = 259
@@ -70,7 +70,8 @@ ns.AURAS = {
     SLICE_AND_DICE     = 5171,
     REVEALING_STRIKE   = 84617,
     RUPTURE            = 1943,
-    HEMORRHAGE         = 16511,
+    -- Hemorrhage is cast as 16511, but its 24-second target DoT is 89775.
+    HEMORRHAGE         = 89775,
     CRIMSON_TEMPEST    = 121411,
     FIND_WEAKNESS      = 91023,
     SHADOW_DANCE       = 51713,

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0-alpha.2
+
+- Fixed live Hemorrhage maintenance after the first Subtlety video pass. The
+  ability is cast with spell ID `16511`, while its actual 24-second target DoT
+  uses aura ID `89775`; tracking the cast ID caused Hemorrhage to be suggested
+  repeatedly.
+- This also unblocks Shadow Dance and Vanish setup, which correctly waited for
+  safe maintenance but could never see Hemorrhage as active in Alpha 1.
+- Confirmed clean Subtlety opener/display transitions and correct
+  Shadow Dance, Shadow Blades, and Vanish side cooldown visibility with the
+  major-cooldown policy both off and on.
+
 ## 0.3.0-alpha.1
 
 - Added the first Subtlety evaluator with Premeditation/Slice and Dice setup,
