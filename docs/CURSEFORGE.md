@@ -87,4 +87,5 @@ Source code, commit history, releases, and issue reports are public:
 
 - `docs/images/compact-combat-display.png` — compact recommendation display.
 - `docs/images/in-game-settings.png` — native in-game settings panel.
-- `docs/images/rogue-rotation-helper-logo.png` — project logo.
+- `docs/images/rogue-rotation-helper-logo-curseforge.png` — padded project
+  logo for square and circular thumbnail crops.
