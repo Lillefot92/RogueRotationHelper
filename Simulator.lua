@@ -25,6 +25,7 @@ local function BaseState()
         isRogue = true,
         isAssassinationSpec = false,
         isCombatSpec = true,
+        isSubtletySpec = false,
         isSupportedSpec = true,
         targetAttackable = true,
         playerLevel = 90,
@@ -46,6 +47,10 @@ local function BaseState()
         sndRemaining = 20,
         rvsRemaining = 20,
         ruptureRemaining = 20,
+        hemorrhageRemaining = 20,
+        crimsonTempestRemaining = 20,
+        findWeaknessRemaining = 0,
+        shadowDanceRemaining = 0,
         envenomRemaining = 0,
         vendettaRemaining = 0,
         blindside = false,
@@ -58,9 +63,15 @@ local function BaseState()
         adrenalineRush = false,
         shadowBlades = false,
         killingSpree = false,
+        shadowDance = false,
+        backstabUsable = true,
         known = known,
         cooldowns = {
             AMBUSH = 0,
+            BACKSTAB = 0,
+            HEMORRHAGE = 0,
+            PREMEDITATION = 30,
+            SHADOW_DANCE = 30,
             MUTILATE = 0,
             DISPATCH = 0,
             ENVENOM = 0,
@@ -110,6 +121,19 @@ local function AssassinationScenario(name, expected, changes, settings,
     changes.specID = ns.ASSASSINATION_SPEC_ID
     changes.isAssassinationSpec = true
     changes.isCombatSpec = false
+    changes.isSubtletySpec = false
+    changes.isSupportedSpec = true
+    return Scenario(name, expected, changes, settings, expectedPool,
+        expectedReasonContains)
+end
+
+local function SubtletyScenario(name, expected, changes, settings,
+    expectedPool, expectedReasonContains)
+    changes = changes or {}
+    changes.specID = ns.SUBTLETY_SPEC_ID
+    changes.isAssassinationSpec = false
+    changes.isCombatSpec = false
+    changes.isSubtletySpec = true
     changes.isSupportedSpec = true
     return Scenario(name, expected, changes, settings, expectedPool,
         expectedReasonContains)
@@ -338,9 +362,80 @@ local scenarios = {
         "SHURIKEN_TOSS", { meleeRange = false, comboPoints = 2 }),
     AssassinationScenario("Assassination uses Deadly Throw at capped points",
         "DEADLY_THROW", { meleeRange = false, comboPoints = 5 }),
-    Scenario("Subtlety stays safely unsupported", nil,
-        { specID = ns.SUBTLETY_SPEC_ID, isCombatSpec = false,
-            isAssassinationSpec = false, isSupportedSpec = false }),
+    SubtletyScenario("Subtlety default builder", "BACKSTAB"),
+    SubtletyScenario("Subtlety uses Hemorrhage from the front", "HEMORRHAGE",
+        { backstabUsable = false }),
+    SubtletyScenario("Subtlety opens with Premeditation", "PREMEDITATION",
+        { comboPoints = 0, stealthed = true, stealthWindow = true,
+            cooldowns = { PREMEDITATION = 0 } }),
+    SubtletyScenario("Subtlety starts Slice and Dice after Premeditation",
+        "SLICE_AND_DICE", { comboPoints = 2, stealthed = true,
+            stealthWindow = true, sndRemaining = 0 }),
+    SubtletyScenario("Subtlety stealth opener uses Ambush", "AMBUSH",
+        { comboPoints = 0, stealthed = true, stealthWindow = true }),
+    SubtletyScenario("Subtlety maintains Hemorrhage", "HEMORRHAGE",
+        { hemorrhageRemaining = 2 }),
+    SubtletyScenario("Subtlety maintains five-point Rupture", "RUPTURE",
+        { comboPoints = 5, ruptureRemaining = 1 }),
+    SubtletyScenario("Subtlety refreshes Slice and Dice first", "SLICE_AND_DICE",
+        { comboPoints = 5, sndRemaining = 1, ruptureRemaining = 1 }),
+    SubtletyScenario("Subtlety spends maintained five points", "EVISCERATE",
+        { comboPoints = 5 }),
+    SubtletyScenario("Subtlety pools to 80 before Shadow Dance", "SHADOW_DANCE",
+        { energy = 70, cooldowns = { SHADOW_DANCE = 0 } },
+        { mode = "single", cooldowns = "on" }, true),
+    SubtletyScenario("Subtlety starts Shadow Dance at 80 Energy", "SHADOW_DANCE",
+        { energy = 85, cooldowns = { SHADOW_DANCE = 0 } },
+        { mode = "single", cooldowns = "on" }, false),
+    SubtletyScenario("Subtlety pairs Shadow Blades inside Dance", "SHADOW_BLADES",
+        { energy = 85, shadowDance = true, shadowDanceRemaining = 7,
+            cooldowns = { SHADOW_DANCE = 30, SHADOW_BLADES = 0 } },
+        { mode = "single", cooldowns = "on" }),
+    SubtletyScenario("Subtlety uses Ambush throughout Dance", "AMBUSH",
+        { shadowDance = true, shadowDanceRemaining = 7,
+            cooldowns = { SHADOW_DANCE = 30 } },
+        { mode = "single", cooldowns = "off" }),
+    SubtletyScenario("Subtlety spends five points during Dance", "EVISCERATE",
+        { comboPoints = 5, shadowDance = true, shadowDanceRemaining = 7,
+            cooldowns = { SHADOW_DANCE = 30 } },
+        { mode = "single", cooldowns = "off" }),
+    SubtletyScenario("Subtlety avoids Ambush overcap without Anticipation",
+        "EVISCERATE", { comboPoints = 4, shadowDance = true,
+            shadowDanceRemaining = 7, talents = { ANTICIPATION = false },
+            cooldowns = { SHADOW_DANCE = 30 } },
+        { mode = "single", cooldowns = "off" }),
+    SubtletyScenario("Subtlety avoids Shadow Blades overcap without Anticipation",
+        "EVISCERATE", { comboPoints = 3, shadowDance = true,
+            shadowDanceRemaining = 7, shadowBlades = true,
+            talents = { ANTICIPATION = false },
+            cooldowns = { SHADOW_DANCE = 30, SHADOW_BLADES = 30 } },
+        { mode = "single", cooldowns = "off" }),
+    SubtletyScenario("Subtlety pools to 80 before Vanish", "VANISH",
+        { energy = 70, comboPoints = 2, findWeaknessRemaining = 1,
+            cooldowns = { SHADOW_DANCE = 10, VANISH = 0 } },
+        { mode = "single", cooldowns = "on" }, true),
+    SubtletyScenario("Subtlety uses Preparation for another Vanish", "PREPARATION",
+        { comboPoints = 2,
+            cooldowns = { SHADOW_DANCE = 20, VANISH = 40, PREPARATION = 0 } },
+        { mode = "single", cooldowns = "on" }),
+    SubtletyScenario("Subtlety auto AoE starts at three targets", "FAN_OF_KNIVES",
+        { enemyCount = 3 }, { mode = "auto", cooldowns = "off" }),
+    SubtletyScenario("Subtlety keeps Ambush in Dance at three targets", "AMBUSH",
+        { enemyCount = 3, shadowDance = true, shadowDanceRemaining = 7,
+            cooldowns = { SHADOW_DANCE = 30 } },
+        { mode = "auto", cooldowns = "off" }),
+    SubtletyScenario("Subtlety uses Fan even in Dance at five targets",
+        "FAN_OF_KNIVES", { enemyCount = 5, shadowDance = true,
+            shadowDanceRemaining = 7, cooldowns = { SHADOW_DANCE = 30 } },
+        { mode = "auto", cooldowns = "off" }),
+    SubtletyScenario("Subtlety maintains Crimson Tempest in mass AoE",
+        "CRIMSON_TEMPEST", { enemyCount = 5, comboPoints = 5,
+            crimsonTempestRemaining = 1 }, { mode = "auto", cooldowns = "off" }),
+    SubtletyScenario("Subtlety spends after Crimson Tempest is safe", "EVISCERATE",
+        { enemyCount = 5, comboPoints = 5, crimsonTempestRemaining = 10 },
+        { mode = "auto", cooldowns = "off" }),
+    SubtletyScenario("Subtlety uses Shuriken Toss while disconnected",
+        "SHURIKEN_TOSS", { meleeRange = false, comboPoints = 2 }),
 }
 
 local function ApplyChanges(state, changes)
@@ -414,6 +509,24 @@ function ns.Simulator_GetPreview()
         state.cooldowns.VANISH = 27.3
         local assassinationSettings = { mode = "single", cooldowns = "boss" }
         return state, ns.Rotation_Evaluate(state, assassinationSettings)
+    end
+    if ns.state and ns.state.specID == ns.SUBTLETY_SPEC_ID then
+        state.specID = ns.SUBTLETY_SPEC_ID
+        state.isAssassinationSpec = false
+        state.isCombatSpec = false
+        state.isSubtletySpec = true
+        state.targetIsBoss = true
+        state.energy = 70
+        state.comboPoints = 2
+        state.sndRemaining = 18.2
+        state.ruptureRemaining = 14.8
+        state.hemorrhageRemaining = 12.4
+        state.findWeaknessRemaining = 0
+        state.cooldowns.SHADOW_DANCE = 0
+        state.cooldowns.SHADOW_BLADES = 8.1
+        state.cooldowns.VANISH = 27.3
+        local subtletySettings = { mode = "single", cooldowns = "boss" }
+        return state, ns.Rotation_Evaluate(state, subtletySettings)
     end
     state.targetIsBoss = true
     state.energy = 46

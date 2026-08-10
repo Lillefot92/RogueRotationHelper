@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.3.0-alpha.1
+
+- Added the first Subtlety evaluator with Premeditation/Slice and Dice setup,
+  Ambush, Backstab, Hemorrhage, Rupture, Eviscerate, and ranged fallbacks.
+- Added maintenance-aware 80-Energy pooling before Shadow Dance and offensive
+  Vanish, Find Weakness tracking, paired Shadow Blades, and Preparation advice.
+- Added Subtlety AoE behavior: Fan of Knives at three or more targets outside
+  Dance, Ambush during Dance at three to four targets, Fan throughout at five
+  or more, and five-point Crimson Tempest maintenance.
+- Added automatic live switching to Subtlety, a Subtlety-specific tooltip,
+  preview state, and Shadow Dance/Shadow Blades/Vanish side cooldown icons.
+- Expanded deterministic coverage from 87 to 110 scenarios and replaced the
+  unsupported-spec smoke test with full Combat/Assassination/Subtlety dispatch.
+- This is a local test alpha; the published Assassination alpha remains
+  unchanged until Subtlety passes its focused live checks.
+
 ## 0.2.0-alpha.2
 
 - Added a small Energy target on the main icon while an ability is being

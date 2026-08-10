@@ -169,9 +169,15 @@ function ns.Settings_Refresh()
             and ("Advanced " .. specName .. " options") or "Advanced options")
     end
     if vanishCheck and vanishCheck.label then
-        vanishCheck.label:SetText(state.isAssassinationSpec
-            and "Suggest offensive Vanish during damage windows"
-            or "Suggest offensive Vanish during Deep Insight")
+        if state.isSubtletySpec then
+            vanishCheck.label:SetText("Vanish is automatic in the core Subtlety rotation")
+            if vanishCheck.Disable then vanishCheck:Disable() end
+        else
+            vanishCheck.label:SetText(state.isAssassinationSpec
+                and "Suggest offensive Vanish during damage windows"
+                or "Suggest offensive Vanish during Deep Insight")
+            if vanishCheck.Enable then vanishCheck:Enable() end
+        end
     end
 end
 

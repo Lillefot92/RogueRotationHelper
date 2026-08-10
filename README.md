@@ -7,7 +7,7 @@
 Rogue Rotation Helper is a transparent, recommendation-only PvE addon for
 Rogues in **World of Warcraft: Mists of Pandaria Classic**. It targets the
 official **5.5.4 client (Interface 50504)** and currently supports **Combat**
-in public beta plus **Assassination** as an external alpha.
+in public beta plus **Assassination** and **Subtlety** as external alphas.
 
 The addon shows what to press next. It never casts a spell, presses a key,
 targets a unit, sends chat, or automates gameplay.
@@ -28,6 +28,9 @@ the validated Combat priorities. It has passed its first level-90 live dummy
 pass and is intended for a small external test. While Energy is being pooled,
 the main icon shows the required Energy number and removes it as soon as the
 recommendation is ready.
+
+The local `0.3.0-alpha.1` test build adds the first Subtlety module. It is not
+published yet; it must first pass the focused live checks in `TESTING.md`.
 
 Found a problem? Use the public
 [issue tracker](https://github.com/Lillefot92/RogueRotationHelper/issues) so the
@@ -87,15 +90,31 @@ report and its eventual fix remain visible to everyone.
 - Shared poison, range, target-counting, talent, action-bar glow, and settings
   support from the Combat beta.
 
+## What the Subtlety alpha includes
+
+- Premeditation into Slice and Dice setup, Ambush stealth windows, Backstab,
+  Hemorrhage, five-point Rupture, and Eviscerate priorities.
+- Find Weakness and Shadow Dance tracking, with an `80` Energy pooling marker
+  before safe Shadow Dance and offensive Vanish windows.
+- Shadow Blades pairing and Preparation advice as part of the normal Subtlety
+  cooldown model; the optional Combat/Assassination Vanish checkbox does not
+  control Subtlety.
+- Automatic AoE at three targets: Fan of Knives outside Dance, Ambush during
+  Dance at three to four targets, and Fan at all times on five or more targets.
+- Five-point Crimson Tempest maintenance in AoE, Subtlety-specific hover
+  timers, and Shadow Dance, Shadow Blades, and Vanish side cooldown icons.
+- A Backstab usability check that falls back to Hemorrhage when Backstab is not
+  available from the player's current position.
+
 ## Level-aware and level-90 talent support
 
 The helper does not assume that the Rogue is level 90. Unlearned abilities are
 removed from the priority automatically. At level 86 it runs the complete
 available supported rotation without asking for a level-90 talent.
 
-- Combat uses Ambush from Stealth; Assassination uses Mutilate. Nightstalker,
-  Shadow Focus, live in-game Energy costs, and Subterfuge's extended Stealth
-  window are recognized.
+- Combat uses Ambush from Stealth, Assassination uses Mutilate, and Subtlety
+  uses Premeditation/Ambush. Nightstalker, Shadow Focus, live in-game Energy
+  costs, and Subterfuge's extended Stealth window are recognized.
 - Deadly Throw can preserve damage when a talented Rogue is forced out of
   melee range.
 - Leeching Poison and Paralytic Poison are recognized as selected non-lethal
@@ -164,6 +183,31 @@ WoWSims MoP Assassination APL:
 - https://www.wowhead.com/mop-classic/guide/classes/rogue/assassination/dps-rotation-cooldowns-abilities-pve
 - https://github.com/wowsims/mop/blob/master/ui/rogue/assassination/apls/assassination.apl.json
 
+## Subtlety alpha rotation model
+
+1. Apply poisons, use Premeditation from Stealth, and establish Slice and Dice.
+2. Open with Ambush to create a Find Weakness window.
+3. Maintain a five-point Rupture and the Hemorrhage bleed, then spend excess
+   points on five-point Eviscerate.
+4. Build with Backstab from behind and fall back to Hemorrhage when Backstab is
+   unavailable from the current position.
+5. Pool to 80 Energy before Shadow Dance when Slice and Dice and the relevant
+   bleed timers safely cover the burst window.
+6. Pair Shadow Blades with Shadow Dance, spend at five points, and otherwise
+   use Ambush throughout Dance.
+7. Use Vanish to refresh an expiring Find Weakness window while Dance is not
+   about to return; Preparation can reset Vanish for another window.
+8. At three to four targets, build with Fan of Knives outside Dance but retain
+   Ambush during Dance. At five or more targets, use Fan even during Dance.
+9. Maintain a five-point Crimson Tempest in AoE before spending on Eviscerate.
+
+The alpha is cross-checked against the current Phase 5 guide, WoWSims source,
+and its Subtlety APL:
+
+- https://www.wowhead.com/mop-classic/guide/classes/rogue/subtlety/dps-rotation-cooldowns-abilities-pve
+- https://github.com/wowsims/mop/tree/master/sim/rogue/subtlety
+- https://github.com/wowsims/mop/blob/master/ui/rogue/subtlety/apls/subtlety.apl.json
+
 ## Installation
 
 1. Exit World of Warcraft.
@@ -175,7 +219,8 @@ WoWSims MoP Assassination APL:
 4. Confirm the final path is:
    `Interface/AddOns/RogueRotationHelper/RogueRotationHelper.toc`
 5. Start MoP Classic and enable **Rogue Rotation Helper** on the AddOns screen.
-6. On a Combat or Assassination Rogue, enter `/rrh test` to preview the display.
+6. On a Combat, Assassination, or Subtlety Rogue, enter `/rrh test` to preview
+   the display.
 7. Enter `/rrh sim`; all rotation checks should pass.
 
 ## Commands
@@ -239,7 +284,9 @@ complete verification and reuse terms.
   targets and dungeon/raid behavior remain external-alpha validation items.
 - The addon sees Rupture only on the current target. It can explain when to
   spread Rupture but cannot select or identify the next unruptured enemy.
-- Subtlety remains unsupported and is planned after Assassination validation.
+- Subtlety is now a local alpha with deterministic coverage. Its opener,
+  Backstab/Hemorrhage positional fallback, Dance/Vanish pooling, cooldown
+  sequence, AoE thresholds, and live specialization switching still need the
+  focused in-game pass before publication.
 
-See `TESTING.md` for the remaining Combat checks and the Assassination alpha
-test pass.
+See `TESTING.md` for the remaining Combat checks and both alpha test passes.

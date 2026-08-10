@@ -5,7 +5,7 @@ Rogue Rotation Helper is intentionally easy to inspect.
 ## What is in the archive
 
 - One `.toc` manifest.
-- Seven readable `.lua` source files.
+- Eight readable `.lua` source files.
 - Markdown documentation and a SHA-256 checksum list.
 
 There are no `.exe`, `.dll`, `.bat`, `.cmd`, `.ps1`, installer, or compiled

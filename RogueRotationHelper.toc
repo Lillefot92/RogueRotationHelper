@@ -2,13 +2,14 @@
 ## Title: Rogue Rotation Helper
 ## Notes: Transparent PvE rotation advisor for Rogues in Mists of Pandaria Classic.
 ## Author: RogueRotationHelper Contributors
-## Version: 0.2.0-alpha.2
+## Version: 0.3.0-alpha.1
 ## SavedVariables: RogueRotationHelperDB
 
 Core.lua
 Rotation.lua
 RotationCombat.lua
 RotationAssassination.lua
+RotationSubtlety.lua
 Simulator.lua
 Display.lua
 Settings.lua

@@ -61,6 +61,8 @@ function Shared.ResolveMode(state, settings)
     local aoeThreshold = ns.CONFIG.AOE_THRESHOLD
     if state.specID == ns.ASSASSINATION_SPEC_ID then
         aoeThreshold = ns.CONFIG.ASSASSINATION_AOE_THRESHOLD or 4
+    elseif state.specID == ns.SUBTLETY_SPEC_ID then
+        aoeThreshold = ns.CONFIG.SUBTLETY_AOE_THRESHOLD or 3
     end
     if enemies >= aoeThreshold then return "aoe" end
     if enemies >= ns.CONFIG.CLEAVE_THRESHOLD then return "cleave" end
@@ -156,6 +158,7 @@ end
 local COOLDOWN_KEYS = {
     [ns.ASSASSINATION_SPEC_ID] = { "VENDETTA", "SHADOW_BLADES", "VANISH" },
     [ns.COMBAT_SPEC_ID] = { "KILLING_SPREE", "ADRENALINE_RUSH", "SHADOW_BLADES" },
+    [ns.SUBTLETY_SPEC_ID] = { "SHADOW_DANCE", "SHADOW_BLADES", "VANISH" },
 }
 
 function ns.Rotation_GetCooldownKeys(specID)
@@ -170,6 +173,8 @@ function ns.Rotation_Evaluate(state, settings)
     if not specID or specID == 0 then
         if state.isAssassinationSpec then
             specID = ns.ASSASSINATION_SPEC_ID
+        elseif state.isSubtletySpec then
+            specID = ns.SUBTLETY_SPEC_ID
         elseif state.isCombatSpec ~= false then
             specID = ns.COMBAT_SPEC_ID
         end

@@ -1,4 +1,4 @@
-# Combat beta and Assassination alpha test pass
+# Combat beta, Assassination alpha, and Subtlety alpha test pass
 
 This build targets official MoP Classic 5.5.4 / Interface 50504.
 
@@ -119,7 +119,7 @@ UI reload. Nine-or-more targets and dungeon/raid behavior remain open checks.
 4. Mouse over the main icon and confirm it shows Slice and Dice, Rupture,
    Envenom, Vendetta, and Blindside state instead of Combat's Revealing Strike
    and Insight details.
-5. Enter `/rrh sim` and confirm all 87 rotation checks pass.
+5. Enter `/rrh sim` and confirm all 110 rotation checks pass.
 
 ### Assassination single target and execute
 
@@ -158,6 +158,57 @@ UI reload. Nine-or-more targets and dungeon/raid behavior remain open checks.
    column and `/rrh status` reports `spec=Combat`.
 3. Repeat a short single-target sequence and confirm Revealing Strike remains
    the normal builder and no Assassination-only spell is recommended.
+
+## Subtlety alpha checks
+
+### Specialization switching and display
+
+1. Switch to Subtlety without reloading the UI.
+2. Confirm `/rrh status` and the settings panel identify **Subtlety Rogue**.
+3. Confirm the side icons are Shadow Dance, Shadow Blades, and Vanish; Combat
+   and Assassination-only cooldown icons must be gone.
+4. Mouse over the main icon and confirm it shows Slice and Dice, Rupture,
+   Hemorrhage, Find Weakness, and Shadow Dance timers.
+5. Enter `/rrh sim` and confirm all 110 checks pass.
+
+### Opener, maintenance, and positioning
+
+1. Set `/rrh mode single` and `/rrh cooldowns off`, then enter Stealth at zero
+   Combo Points. Confirm Premeditation is recommended first.
+2. Use Premeditation and confirm Slice and Dice follows before Ambush.
+3. Confirm Ambush opens the target, Hemorrhage is established, a five-point
+   Rupture follows, and later five-point finishers use Eviscerate.
+4. Stand behind the target and confirm Backstab is the normal maintained-state
+   builder. Move in front and confirm the recommendation falls back to
+   Hemorrhage instead of repeatedly asking for an unusable Backstab.
+5. Let Slice and Dice, Rupture, and Hemorrhage approach expiry separately and
+   confirm each is refreshed before a new burst window is suggested.
+
+### Shadow Dance, Vanish, and Energy pooling
+
+1. Set `/rrh cooldowns on` on a long-lived dummy.
+2. With maintenance safely covered and Shadow Dance ready, confirm its icon is
+   gold and shows `80` below 80 Energy, then becomes ready at 80 Energy.
+3. During Shadow Dance, confirm Shadow Blades is paired, Eviscerate spends at
+   five points, and Ambush is the builder between finishers.
+4. After Find Weakness is nearly expired and Shadow Dance is at least five
+   seconds away, confirm Vanish also pools to 80 before opening another Ambush
+   window. Subtlety does this automatically regardless of `/rrh vanish`.
+5. After Vanish is on a long cooldown, confirm Preparation can be recommended
+   when maintenance is safe and Shadow Dance is not close.
+
+### Subtlety AoE
+
+1. In automatic mode, confirm two targets remain cleave and three targets
+   switch to AoE.
+2. At three to four targets outside Shadow Dance, confirm Fan of Knives is the
+   builder. During Shadow Dance, confirm Ambush returns.
+3. At five or more targets, confirm Fan of Knives remains the builder even
+   during Shadow Dance.
+4. At five Combo Points, confirm Crimson Tempest is maintained before excess
+   points are spent on Eviscerate.
+5. Let the pack shrink through five, three, two, and one target and confirm the
+   mode and builder update without stale Subtlety recommendations.
 
 ## Combat dungeon or raid checks
 

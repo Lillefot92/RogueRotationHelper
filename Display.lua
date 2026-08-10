@@ -141,6 +141,17 @@ local function ShowTooltip(owner)
                 string.format("%.1f / %s", lastState.vendettaRemaining or 0,
                     lastState.blindside and "active" or "inactive"),
                 0.65, 0.70, 0.78, 1, 1, 1)
+        elseif lastState.specID == ns.SUBTLETY_SPEC_ID then
+            GameTooltip:AddDoubleLine("SnD / Rupture / Hemorrhage",
+                string.format("%.1f / %.1f / %.1f",
+                    lastState.sndRemaining or 0, lastState.ruptureRemaining or 0,
+                    lastState.hemorrhageRemaining or 0),
+                0.65, 0.70, 0.78, 1, 1, 1)
+            GameTooltip:AddDoubleLine("Find Weakness / Shadow Dance",
+                string.format("%.1f / %.1f",
+                    lastState.findWeaknessRemaining or 0,
+                    lastState.shadowDanceRemaining or 0),
+                0.65, 0.70, 0.78, 1, 1, 1)
         else
             GameTooltip:AddDoubleLine("SnD / RvS / Rupture",
                 string.format("%.1f / %.1f / %.1f",
@@ -229,6 +240,7 @@ function ns.Display_Create()
     CreateCooldownEntry(frame, "KILLING_SPREE")
     CreateCooldownEntry(frame, "ADRENALINE_RUSH")
     CreateCooldownEntry(frame, "VENDETTA")
+    CreateCooldownEntry(frame, "SHADOW_DANCE")
     CreateCooldownEntry(frame, "SHADOW_BLADES")
     CreateCooldownEntry(frame, "VANISH")
 

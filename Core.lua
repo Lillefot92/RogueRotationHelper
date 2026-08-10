@@ -8,7 +8,7 @@
 
 local ADDON_NAME, ns = ...
 
-ns.VERSION = "0.2.0-alpha.2"
+ns.VERSION = "0.3.0-alpha.1"
 ns.INTERFACE = 50504
 ns.ROGUE_CLASS_FILE = "ROGUE"
 ns.ASSASSINATION_SPEC_ID = 259
@@ -32,6 +32,10 @@ ns.ABILITIES = {
     LEECHING_POISON   = { id = 108211, cost = 0 },
     PARALYTIC_POISON  = { id = 108215, cost = 0 },
     AMBUSH            = { id = 8676,   cost = 60, target = true },
+    BACKSTAB          = { id = 53,     cost = 35, target = true },
+    HEMORRHAGE        = { id = 16511,  cost = 30, target = true },
+    PREMEDITATION     = { id = 14183,  cost = 0,  target = true },
+    SHADOW_DANCE      = { id = 51713,  cost = 0 },
     MUTILATE          = { id = 1329,   cost = 55, target = true },
     DISPATCH          = { id = 111240, cost = 30, target = true },
     ENVENOM           = { id = 32645,  cost = 35, target = true },
@@ -66,6 +70,10 @@ ns.AURAS = {
     SLICE_AND_DICE     = 5171,
     REVEALING_STRIKE   = 84617,
     RUPTURE            = 1943,
+    HEMORRHAGE         = 16511,
+    CRIMSON_TEMPEST    = 121411,
+    FIND_WEAKNESS      = 91023,
+    SHADOW_DANCE       = 51713,
     KILLING_SPREE      = 51690,
     ADRENALINE_RUSH    = 13750,
     SHADOW_BLADES      = 121471,
@@ -123,6 +131,15 @@ ns.CONFIG = {
     ASSASSINATION_ENVENOM_POOL = 80,
     ASSASSINATION_RUPTURE_MIN_TTD = 8,
     ASSASSINATION_VENDETTA_MIN_TTD = 20,
+    SUBTLETY_AOE_THRESHOLD = 3,
+    SUBTLETY_FAN_ALWAYS_THRESHOLD = 5,
+    SUBTLETY_BURST_POOL = 80,
+    SUBTLETY_MAINTENANCE_SAFE = 4,
+    SUBTLETY_FIND_WEAKNESS_REFRESH = 1.5,
+    SUBTLETY_HEMORRHAGE_REFRESH = 3,
+    SUBTLETY_RUPTURE_MIN_TTD = 8,
+    SUBTLETY_CRIMSON_TEMPEST_MIN_TTD = 8,
+    SUBTLETY_BURST_MIN_TTD = 8,
     SND_EMERGENCY = 1.5,
     SND_FIVE_CP_REFRESH = 3.0,
     RVS_REFRESH = 3.0,
@@ -143,6 +160,7 @@ ns.state = {
     specID = 0,
     isAssassinationSpec = false,
     isCombatSpec = false,
+    isSubtletySpec = false,
     isSupportedSpec = false,
     inCombat = false,
     inRaid = false,
@@ -174,6 +192,10 @@ ns.state = {
     sndRemaining = 0,
     rvsRemaining = 0,
     ruptureRemaining = 0,
+    hemorrhageRemaining = 0,
+    crimsonTempestRemaining = 0,
+    findWeaknessRemaining = 0,
+    shadowDanceRemaining = 0,
     envenomRemaining = 0,
     vendettaRemaining = 0,
     blindside = false,
@@ -186,6 +208,8 @@ ns.state = {
     adrenalineRush = false,
     shadowBlades = false,
     killingSpree = false,
+    shadowDance = false,
+    backstabUsable = true,
     nearbyEnemies = {},
     nearbyAreaCastUntil = 0,
     debugNameplateCount = 0,
@@ -290,7 +314,9 @@ function ns.GetSpecName(specID)
 end
 
 function ns.IsSupportedSpec(specID)
-    return specID == ns.ASSASSINATION_SPEC_ID or specID == ns.COMBAT_SPEC_ID
+    return specID == ns.ASSASSINATION_SPEC_ID
+        or specID == ns.COMBAT_SPEC_ID
+        or specID == ns.SUBTLETY_SPEC_ID
 end
 
 function ns.PlayerKnowsSpell(spellID)
@@ -388,6 +414,29 @@ function ns.IsAbilityInRange(key, unit)
         local info = ns.GetSpellInfo(ability.id)
         local result = info and IsSpellInRange(info.name, unit)
         if result ~= nil then return result == 1 end
+    end
+    return true
+end
+
+-- IsUsableSpell reports positional failures such as trying Backstab from the
+-- front. A lack of Energy is deliberately treated as usable because pooling is
+-- handled by the evaluator and should not change the recommended builder.
+function ns.IsAbilityUsable(key)
+    local ability = ns.ABILITIES[key]
+    if not ability then return false end
+    if C_Spell and C_Spell.IsSpellUsable then
+        local ok, usable, noEnergy = pcall(C_Spell.IsSpellUsable, ability.id)
+        if ok and usable ~= nil then
+            return usable == true or noEnergy == true
+        end
+    end
+    if IsUsableSpell then
+        local info = ns.GetSpellInfo(ability.id)
+        local usable, noEnergy = IsUsableSpell((info and info.name) or ability.id)
+        if usable ~= nil then
+            return usable == true or usable == 1
+                or noEnergy == true or noEnergy == 1
+        end
     end
     return true
 end
@@ -648,6 +697,8 @@ function ns.ResolveMode(requestedMode, enemyCount, specID)
     local aoeThreshold = ns.CONFIG.AOE_THRESHOLD
     if specID == ns.ASSASSINATION_SPEC_ID then
         aoeThreshold = ns.CONFIG.ASSASSINATION_AOE_THRESHOLD or 4
+    elseif specID == ns.SUBTLETY_SPEC_ID then
+        aoeThreshold = ns.CONFIG.SUBTLETY_AOE_THRESHOLD or 3
     end
     if enemyCount >= aoeThreshold then return "aoe" end
     if enemyCount >= ns.CONFIG.CLEAVE_THRESHOLD then return "cleave" end
@@ -665,6 +716,7 @@ function ns.RefreshState()
     s.specID = GetSpecID()
     s.isAssassinationSpec = s.isRogue and s.specID == ns.ASSASSINATION_SPEC_ID
     s.isCombatSpec = s.isRogue and s.specID == ns.COMBAT_SPEC_ID
+    s.isSubtletySpec = s.isRogue and s.specID == ns.SUBTLETY_SPEC_ID
     s.isSupportedSpec = s.isRogue and ns.IsSupportedSpec(s.specID)
     s.inCombat = UnitAffectingCombat("player") == true
     s.inRaid = IsInRaid and IsInRaid() == true
@@ -698,7 +750,8 @@ function ns.RefreshState()
     s.targetIsBoss = s.targetExists
         and (classification == "worldboss" or (UnitLevel("target") or 0) == -1)
     s.targetTTD = EstimateTargetTTD(s.targetGUID, s.targetHealth, now, s.targetIsBoss)
-    local meleeAbility = s.isAssassinationSpec and "MUTILATE" or "SINISTER_STRIKE"
+    local meleeAbility = s.isAssassinationSpec and "MUTILATE"
+        or (s.isSubtletySpec and "BACKSTAB") or "SINISTER_STRIKE"
     s.meleeRange = s.targetAttackable
         and ns.IsAbilityInRange(meleeAbility, "target") or false
     s.shurikenRange = s.targetAttackable
@@ -708,6 +761,12 @@ function ns.RefreshState()
     local snd = ns.FindAura("player", ns.AURAS.SLICE_AND_DICE, "HELPFUL")
     local rvs = ns.FindAura("target", ns.AURAS.REVEALING_STRIKE, "HARMFUL", true)
     local rupture = ns.FindAura("target", ns.AURAS.RUPTURE, "HARMFUL", true)
+    local hemorrhage = ns.FindAura("target", ns.AURAS.HEMORRHAGE, "HARMFUL", true)
+    local crimsonTempest = ns.FindAura("target", ns.AURAS.CRIMSON_TEMPEST,
+        "HARMFUL", true)
+    local findWeakness = ns.FindAura("target", ns.AURAS.FIND_WEAKNESS,
+        "HARMFUL", true)
+    local shadowDance = ns.FindAura("player", ns.AURAS.SHADOW_DANCE, "HELPFUL")
     local envenom = ns.FindAura("player", ns.AURAS.ENVENOM, "HELPFUL")
     local vendetta = ns.FindAura("target", ns.AURAS.VENDETTA, "HARMFUL", true)
     local blindside = ns.FindAura("player", ns.AURAS.BLINDSIDE, "HELPFUL")
@@ -743,6 +802,10 @@ function ns.RefreshState()
     s.sndRemaining = AuraRemaining(snd, now)
     s.rvsRemaining = AuraRemaining(rvs, now)
     s.ruptureRemaining = AuraRemaining(rupture, now)
+    s.hemorrhageRemaining = AuraRemaining(hemorrhage, now)
+    s.crimsonTempestRemaining = AuraRemaining(crimsonTempest, now)
+    s.findWeaknessRemaining = AuraRemaining(findWeakness, now)
+    s.shadowDanceRemaining = AuraRemaining(shadowDance, now)
     s.envenomRemaining = AuraRemaining(envenom, now)
     s.vendettaRemaining = AuraRemaining(vendetta, now)
     s.blindside = blindside ~= nil
@@ -750,6 +813,8 @@ function ns.RefreshState()
     s.adrenalineRush = adrenalineRush ~= nil
     s.shadowBlades = shadowBlades ~= nil
     s.killingSpree = killingSpree ~= nil
+    s.shadowDance = shadowDance ~= nil
+    s.backstabUsable = ns.IsAbilityUsable("BACKSTAB")
     s.kidneyShotRemaining = AuraRemaining(kidneyShot, now)
 
     if s.isCombatSpec then
@@ -780,6 +845,8 @@ local AREA_CAST_SPELLS = {
 }
 local NEARBY_DAMAGE_SPELLS = {
     [ns.ABILITIES.AMBUSH.id] = true,
+    [ns.ABILITIES.BACKSTAB.id] = true,
+    [ns.ABILITIES.HEMORRHAGE.id] = true,
     [ns.ABILITIES.MUTILATE.id] = true,
     [ns.ABILITIES.DISPATCH.id] = true,
     [ns.ABILITIES.ENVENOM.id] = true,
