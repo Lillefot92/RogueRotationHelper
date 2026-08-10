@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0-beta.1
+
+- Published the first unified public beta containing Combat plus the
+  Assassination and Subtlety external-alpha evaluators.
+- Completed focused level-90 Subtlety live validation for the opener,
+  maintenance cycle, 80-Energy Shadow Dance and Vanish pooling, paired Shadow
+  Blades, Find Weakness windows, Preparation ordering, AoE recommendations,
+  cooldown display, and specialization switching.
+- Kept Combat priorities unchanged from the validated public beta and retained
+  the Assassination behavior previously published as `0.2.0-alpha.2`.
+- Documented remaining external checks: live raid-boss cooldown timing,
+  Assassination mass-AoE/dungeon behavior, and Subtlety dungeon/raid packs.
+- Passed all 112 deterministic rotation scenarios before packaging.
+
 ## 0.3.0-alpha.3
 
 - Fixed live Find Weakness tracking from the second Subtlety video pass.

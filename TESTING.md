@@ -161,6 +161,12 @@ UI reload. Nine-or-more targets and dungeon/raid behavior remain open checks.
 
 ## Subtlety alpha checks
 
+Focused level-90 live validation has passed for the opener and maintenance
+cycle, 80-Energy Shadow Dance and Vanish pooling, Find Weakness windows,
+Preparation ordering, AoE recommendations, cooldown display, and live
+specialization switching. Dungeon and raid behavior remains open for external
+testing.
+
 ### Specialization switching and display
 
 1. Switch to Subtlety without reloading the UI.
@@ -226,6 +232,9 @@ UI reload. Nine-or-more targets and dungeon/raid behavior remain open checks.
 - Assassination has passed its first live dummy and specialization-switching
   pass. Use external-alpha feedback to validate nine-or-more targets and live
   dungeon/raid behavior.
+- Subtlety has passed its focused live dummy and AoE passes. Use external-alpha
+  feedback to validate real dungeon/raid packs, target-count transitions, and
+  encounter-specific burst timing.
 
 ## Useful feedback
 

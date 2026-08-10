@@ -14,7 +14,7 @@ targets a unit, sends chat, or automates gameplay.
 
 ## Download the public beta
 
-Download `RogueRotationHelper-0.1.0-beta.2.zip` from the official
+Download `RogueRotationHelper-0.3.0-beta.1.zip` from the official
 [GitHub Releases page](https://github.com/Lillefot92/RogueRotationHelper/releases).
 The release ZIP contains only readable Lua source and documentation. Do not
 install similarly named executables or third-party installers.
@@ -23,14 +23,11 @@ Combat has passed level-90 single-target dummy and live dungeon testing. The
 remaining beta item is boss-specific cooldown validation on a live raid boss;
 it is not required for general dungeon and dummy feedback.
 
-Version `0.2.0-alpha.2` adds the first Assassination module without changing
-the validated Combat priorities. It has passed its first level-90 live dummy
-pass and is intended for a small external test. While Energy is being pooled,
-the main icon shows the required Energy number and removes it as soon as the
-recommendation is ready.
-
-The local `0.3.0-alpha.3` test build adds the first Subtlety module. It is not
-published yet; it must first pass the focused live checks in `TESTING.md`.
+Version `0.3.0-beta.1` brings Combat, Assassination, and Subtlety into one
+public testing build. Combat remains the most validated specialization.
+Assassination and Subtlety have passed their focused level-90 live dummy,
+display, pooling, AoE, and specialization-switching checks and remain clearly
+labelled as external alphas while dungeon and raid feedback is collected.
 
 Found a problem? Use the public
 [issue tracker](https://github.com/Lillefot92/RogueRotationHelper/issues) so the
@@ -284,9 +281,11 @@ complete verification and reuse terms.
   targets and dungeon/raid behavior remain external-alpha validation items.
 - The addon sees Rupture only on the current target. It can explain when to
   spread Rupture but cannot select or identify the next unruptured enemy.
-- Subtlety is now a local alpha with deterministic coverage. Its opener,
-  Backstab/Hemorrhage positional fallback, Dance/Vanish pooling, cooldown
-  sequence, AoE thresholds, and live specialization switching still need the
-  focused in-game pass before publication.
+- Subtlety has passed focused level-90 live checks for its opener,
+  Backstab/Hemorrhage maintenance, Shadow Dance and Vanish pooling, Find
+  Weakness windows, Preparation ordering, AoE recommendations, cooldown
+  display, and live specialization switching. Dungeon and raid behavior,
+  including automatic target-count transitions on real packs, remains an
+  external-alpha validation item.
 
 See `TESTING.md` for the remaining Combat checks and both alpha test passes.
