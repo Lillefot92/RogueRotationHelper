@@ -195,18 +195,6 @@ local function Evaluate(state, settings)
     local blades = ShadowBladesDecision(state, mode, cooldownsAllowed, fanAlways)
     if blades then return blades end
 
-    -- Preparation exists primarily to create a second Vanish/Find Weakness
-    -- window for Subtlety. Do not spend it while Dance is about to return.
-    if cooldownsAllowed and not fanAlways and Ready(state, "PREPARATION")
-        and Cooldown(state, "VANISH") > 30
-        and Cooldown(state, "SHADOW_DANCE") > 10
-        and comboPoints < 3 and MaintenanceSafe(state, aoe)
-        and Value(state, "targetTTD", 999) >= 15 then
-        return Decision(state, "PREPARATION",
-            "Reset Vanish for another Find Weakness window",
-            { mode = mode, offGCD = true })
-    end
-
     local prey = Shared.PreyOnWeakDecision(state, settings, mode)
     if prey then return prey end
 
@@ -231,6 +219,20 @@ local function Evaluate(state, settings)
         return Decision(state, "AMBUSH",
             "Use the stealth window to apply Find Weakness", { mode = mode })
     end
+
+    -- Preparation exists primarily to create a second Vanish/Find Weakness
+    -- window for Subtlety. It must come after the stealth Ambush so it can
+    -- never consume the recommendation slot during Vanish itself.
+    if cooldownsAllowed and not fanAlways and Ready(state, "PREPARATION")
+        and Cooldown(state, "VANISH") > 30
+        and Cooldown(state, "SHADOW_DANCE") > 10
+        and comboPoints < 3 and MaintenanceSafe(state, aoe)
+        and Value(state, "targetTTD", 999) >= 15 then
+        return Decision(state, "PREPARATION",
+            "Reset Vanish after applying Find Weakness with Ambush",
+            { mode = mode, offGCD = true })
+    end
+
     if aoe and Ready(state, "FAN_OF_KNIVES") then
         return Decision(state, "FAN_OF_KNIVES",
             "Build Combo Points on three or more targets", { mode = mode })

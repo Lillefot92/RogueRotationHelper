@@ -8,7 +8,7 @@
 
 local ADDON_NAME, ns = ...
 
-ns.VERSION = "0.3.0-alpha.2"
+ns.VERSION = "0.3.0-alpha.3"
 ns.INTERFACE = 50504
 ns.ROGUE_CLASS_FILE = "ROGUE"
 ns.ASSASSINATION_SPEC_ID = 259
@@ -73,7 +73,8 @@ ns.AURAS = {
     -- Hemorrhage is cast as 16511, but its 24-second target DoT is 89775.
     HEMORRHAGE         = 89775,
     CRIMSON_TEMPEST    = 121411,
-    FIND_WEAKNESS      = 91023,
+    -- 91023 is the passive; Ambush/Garrote apply target debuff 91021.
+    FIND_WEAKNESS      = 91021,
     SHADOW_DANCE       = 51713,
     KILLING_SPREE      = 51690,
     ADRENALINE_RUSH    = 13750,

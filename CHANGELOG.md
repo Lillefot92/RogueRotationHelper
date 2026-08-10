@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0-alpha.3
+
+- Fixed live Find Weakness tracking from the second Subtlety video pass.
+  `91023` is the passive spell, while Ambush and Garrote apply target debuff
+  `91021`; using the passive ID caused Vanish to overlap an active Find
+  Weakness window immediately after Shadow Dance.
+- Moved Preparation behind the stealth Ambush priority. The first Vanish can
+  now always apply Find Weakness before Preparation resets Vanish for a later
+  window.
+- Confirmed live 80-Energy Shadow Dance pooling, paired Shadow Blades,
+  Premeditation/Ambush Dance actions, corrected 24-second Hemorrhage upkeep,
+  and the normal cooldown-disabled maintenance cycle.
+- Expanded the deterministic rotation suite from 110 to 112 scenarios.
+
 ## 0.3.0-alpha.2
 
 - Fixed live Hemorrhage maintenance after the first Subtlety video pass. The

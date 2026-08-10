@@ -119,7 +119,7 @@ UI reload. Nine-or-more targets and dungeon/raid behavior remain open checks.
 4. Mouse over the main icon and confirm it shows Slice and Dice, Rupture,
    Envenom, Vendetta, and Blindside state instead of Combat's Revealing Strike
    and Insight details.
-5. Enter `/rrh sim` and confirm all 110 rotation checks pass.
+5. Enter `/rrh sim` and confirm all 112 rotation checks pass.
 
 ### Assassination single target and execute
 
@@ -169,7 +169,7 @@ UI reload. Nine-or-more targets and dungeon/raid behavior remain open checks.
    and Assassination-only cooldown icons must be gone.
 4. Mouse over the main icon and confirm it shows Slice and Dice, Rupture,
    Hemorrhage, Find Weakness, and Shadow Dance timers.
-5. Enter `/rrh sim` and confirm all 110 checks pass.
+5. Enter `/rrh sim` and confirm all 112 checks pass.
 
 ### Opener, maintenance, and positioning
 

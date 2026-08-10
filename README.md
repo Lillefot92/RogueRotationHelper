@@ -29,7 +29,7 @@ pass and is intended for a small external test. While Energy is being pooled,
 the main icon shows the required Energy number and removes it as soon as the
 recommendation is ready.
 
-The local `0.3.0-alpha.2` test build adds the first Subtlety module. It is not
+The local `0.3.0-alpha.3` test build adds the first Subtlety module. It is not
 published yet; it must first pass the focused live checks in `TESTING.md`.
 
 Found a problem? Use the public
