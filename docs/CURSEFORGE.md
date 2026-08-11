@@ -66,8 +66,8 @@ Source code, commit history, releases, and issue reports are public:
 
 ## First file
 
-- Display name: `Rogue Rotation Helper 0.3.0-beta.1`
-- File: `RogueRotationHelper-0.3.0-beta.1.zip`
+- Display name: `Rogue Rotation Helper 0.3.0-beta.2`
+- File: `RogueRotationHelper-0.3.0-beta.2.zip`
 - Release type: `Beta`
 - Supported game version: `5.5.4`
 - Flavor: `MoP Classic`
@@ -75,11 +75,11 @@ Source code, commit history, releases, and issue reports are public:
 
 ## File changelog
 
-- Added the first publicly testable Subtlety rotation.
-- Added Shadow Dance and Vanish pooling, Find Weakness tracking, Preparation
-  ordering, and Subtlety AoE priorities.
-- Included the previously tested Assassination alpha and validated Combat beta
-  in one package.
+- Fixed a Lua error caused by incomplete `UNIT_SPELLCAST_SUCCEEDED` events.
+- Safely ignores spellcast notifications that contain no spell ID while
+  retaining modern and legacy event-signature support.
+- Includes the same Combat beta plus Assassination and Subtlety external alphas
+  as `0.3.0-beta.1` with no rotation-priority changes.
 - Passed all 112 deterministic rotation scenarios.
 - See the public `CHANGELOG.md` for the complete version history.
 

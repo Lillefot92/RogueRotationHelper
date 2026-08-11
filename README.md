@@ -14,7 +14,7 @@ targets a unit, sends chat, or automates gameplay.
 
 ## Download the public beta
 
-Download `RogueRotationHelper-0.3.0-beta.1.zip` from the official
+Download `RogueRotationHelper-0.3.0-beta.2.zip` from the official
 [GitHub Releases page](https://github.com/Lillefot92/RogueRotationHelper/releases).
 The release ZIP contains only readable Lua source and documentation. Do not
 install similarly named executables or third-party installers.
@@ -23,8 +23,9 @@ Combat has passed level-90 single-target dummy and live dungeon testing. The
 remaining beta item is boss-specific cooldown validation on a live raid boss;
 it is not required for general dungeon and dummy feedback.
 
-Version `0.3.0-beta.1` brings Combat, Assassination, and Subtlety into one
-public testing build. Combat remains the most validated specialization.
+Version `0.3.0-beta.2` fixes an incomplete spellcast-event Lua error in the
+unified Combat, Assassination, and Subtlety testing build. Combat remains the
+most validated specialization.
 Assassination and Subtlety have passed their focused level-90 live dummy,
 display, pooling, AoE, and specialization-switching checks and remain clearly
 labelled as external alphas while dungeon and raid feedback is collected.

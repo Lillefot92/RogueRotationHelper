@@ -8,7 +8,7 @@
 
 local ADDON_NAME, ns = ...
 
-ns.VERSION = "0.3.0-beta.1"
+ns.VERSION = "0.3.0-beta.2"
 ns.INTERFACE = 50504
 ns.ROGUE_CLASS_FILE = "ROGUE"
 ns.ASSASSINATION_SPEC_ID = 259
@@ -1110,8 +1110,13 @@ eventFrame:SetScript("OnEvent", function(_, event, ...)
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         HandleCombatLog()
     elseif event == "UNIT_SPELLCAST_SUCCEEDED" and arg1 == "player" then
-        local spellID = tonumber(select(3, ...)) or tonumber(select(5, ...))
-        MarkAreaCast(spellID)
+        -- MoP can emit this event without a spell payload for some casts.
+        -- Assign the varargs first so an absent value becomes nil instead of
+        -- expanding to zero arguments in tonumber(). The fifth argument keeps
+        -- compatibility with older UNIT_SPELLCAST_SUCCEEDED signatures.
+        local _, _, eventSpellID, _, legacySpellID = ...
+        local spellID = tonumber(eventSpellID) or tonumber(legacySpellID)
+        if spellID then MarkAreaCast(spellID) end
     elseif event == "SPELLS_CHANGED" or event == "PLAYER_SPECIALIZATION_CHANGED"
         or event == "PLAYER_TALENT_UPDATE" or event == "PLAYER_LEVEL_UP" then
         RefreshKnownAbilities()

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0-beta.2
+
+- Fixed a Lua error when Mists of Pandaria Classic fires
+  `UNIT_SPELLCAST_SUCCEEDED` with only the player unit token and no spell ID.
+- Incomplete spellcast events are now ignored safely while the modern and
+  legacy spell-ID positions remain supported for confirmed area casts.
+- Passed the full addon load test and all 112 deterministic rotation scenarios.
+
 ## 0.3.0-beta.1
 
 - Published the first unified public beta containing Combat plus the
