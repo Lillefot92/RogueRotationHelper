@@ -1,0 +1,40 @@
+name: Validate addon
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Repository and rotation checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install the WoW-compatible Lua runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes lua5.1
+
+      - name: Validate repository integrity
+        run: python3 tests/validate_repository.py
+
+      - name: Run all rotation scenarios
+        run: lua5.1 tests/run_simulator.lua
+
+      - name: Verify release packaging
+        run: python3 tools/build_release.py --output dist
