@@ -8,10 +8,18 @@
 
 local ADDON_NAME, ns = ...
 
-ns.VERSION = "0.1.0-beta.2"
+ns.VERSION = "0.3.0-beta.2"
 ns.INTERFACE = 50504
 ns.ROGUE_CLASS_FILE = "ROGUE"
+ns.ASSASSINATION_SPEC_ID = 259
 ns.COMBAT_SPEC_ID = 260
+ns.SUBTLETY_SPEC_ID = 261
+
+ns.SPEC_NAMES = {
+    [ns.ASSASSINATION_SPEC_ID] = "Assassination",
+    [ns.COMBAT_SPEC_ID] = "Combat",
+    [ns.SUBTLETY_SPEC_ID] = "Subtlety",
+}
 
 local ENERGY_POWER_TYPE = (Enum and Enum.PowerType and Enum.PowerType.Energy) or 3
 local COMBO_POWER_TYPE = (Enum and Enum.PowerType and Enum.PowerType.ComboPoints) or 4
@@ -24,6 +32,15 @@ ns.ABILITIES = {
     LEECHING_POISON   = { id = 108211, cost = 0 },
     PARALYTIC_POISON  = { id = 108215, cost = 0 },
     AMBUSH            = { id = 8676,   cost = 60, target = true },
+    BACKSTAB          = { id = 53,     cost = 35, target = true },
+    HEMORRHAGE        = { id = 16511,  cost = 30, target = true },
+    PREMEDITATION     = { id = 14183,  cost = 0,  target = true },
+    SHADOW_DANCE      = { id = 51713,  cost = 0 },
+    MUTILATE          = { id = 1329,   cost = 55, target = true },
+    DISPATCH          = { id = 111240, cost = 30, target = true },
+    ENVENOM           = { id = 32645,  cost = 35, target = true },
+    VENDETTA          = { id = 79140,  cost = 0,  target = true },
+    PREPARATION       = { id = 14185,  cost = 0 },
     SLICE_AND_DICE    = { id = 5171,   cost = 25 },
     REVEALING_STRIKE  = { id = 84617,  cost = 40, target = true },
     SINISTER_STRIKE   = { id = 1752,   cost = 50, target = true },
@@ -53,6 +70,12 @@ ns.AURAS = {
     SLICE_AND_DICE     = 5171,
     REVEALING_STRIKE   = 84617,
     RUPTURE            = 1943,
+    -- Hemorrhage is cast as 16511, but its 24-second target DoT is 89775.
+    HEMORRHAGE         = 89775,
+    CRIMSON_TEMPEST    = 121411,
+    -- 91023 is the passive; Ambush/Garrote apply target debuff 91021.
+    FIND_WEAKNESS      = 91021,
+    SHADOW_DANCE       = 51713,
     KILLING_SPREE      = 51690,
     ADRENALINE_RUSH    = 13750,
     SHADOW_BLADES      = 121471,
@@ -60,6 +83,9 @@ ns.AURAS = {
     ANTICIPATION       = 115189,
     ANTICIPATION_LEGACY = 114015,
     SUBTERFUGE         = 115192,
+    BLINDSIDE          = 121153,
+    ENVENOM            = 32645,
+    VENDETTA           = 79140,
     KIDNEY_SHOT        = 408,
     SHALLOW_INSIGHT    = 84745,
     MODERATE_INSIGHT   = 84746,
@@ -101,6 +127,21 @@ ns.CONFIG = {
     MELEE_RANGE_SPELL = 1752,
     CLEAVE_THRESHOLD = 2,
     AOE_THRESHOLD = 8,
+    ASSASSINATION_AOE_THRESHOLD = 4,
+    ASSASSINATION_MASS_AOE_THRESHOLD = 9,
+    ASSASSINATION_RUPTURE_MULTI_CP = 3,
+    ASSASSINATION_ENVENOM_POOL = 80,
+    ASSASSINATION_RUPTURE_MIN_TTD = 8,
+    ASSASSINATION_VENDETTA_MIN_TTD = 20,
+    SUBTLETY_AOE_THRESHOLD = 3,
+    SUBTLETY_FAN_ALWAYS_THRESHOLD = 5,
+    SUBTLETY_BURST_POOL = 80,
+    SUBTLETY_MAINTENANCE_SAFE = 4,
+    SUBTLETY_FIND_WEAKNESS_REFRESH = 1.5,
+    SUBTLETY_HEMORRHAGE_REFRESH = 3,
+    SUBTLETY_RUPTURE_MIN_TTD = 8,
+    SUBTLETY_CRIMSON_TEMPEST_MIN_TTD = 8,
+    SUBTLETY_BURST_MIN_TTD = 8,
     SND_EMERGENCY = 1.5,
     SND_FIVE_CP_REFRESH = 3.0,
     RVS_REFRESH = 3.0,
@@ -119,7 +160,10 @@ ns.state = {
     playerLevel = 0,
     isRogue = false,
     specID = 0,
+    isAssassinationSpec = false,
     isCombatSpec = false,
+    isSubtletySpec = false,
+    isSupportedSpec = false,
     inCombat = false,
     inRaid = false,
     energy = 0,
@@ -150,6 +194,13 @@ ns.state = {
     sndRemaining = 0,
     rvsRemaining = 0,
     ruptureRemaining = 0,
+    hemorrhageRemaining = 0,
+    crimsonTempestRemaining = 0,
+    findWeaknessRemaining = 0,
+    shadowDanceRemaining = 0,
+    envenomRemaining = 0,
+    vendettaRemaining = 0,
+    blindside = false,
     deadlyPoisonRemaining = 0,
     utilityPoisonRemaining = 0,
     utilityPoisonKey = nil,
@@ -159,6 +210,8 @@ ns.state = {
     adrenalineRush = false,
     shadowBlades = false,
     killingSpree = false,
+    shadowDance = false,
+    backstabUsable = true,
     nearbyEnemies = {},
     nearbyAreaCastUntil = 0,
     debugNameplateCount = 0,
@@ -258,6 +311,16 @@ function ns.GetAbilityIcon(key)
     return info and info.iconID or 134400
 end
 
+function ns.GetSpecName(specID)
+    return ns.SPEC_NAMES[specID] or "Unsupported"
+end
+
+function ns.IsSupportedSpec(specID)
+    return specID == ns.ASSASSINATION_SPEC_ID
+        or specID == ns.COMBAT_SPEC_ID
+        or specID == ns.SUBTLETY_SPEC_ID
+end
+
 function ns.PlayerKnowsSpell(spellID)
     if not spellID then return false end
     if IsPlayerSpell then
@@ -353,6 +416,29 @@ function ns.IsAbilityInRange(key, unit)
         local info = ns.GetSpellInfo(ability.id)
         local result = info and IsSpellInRange(info.name, unit)
         if result ~= nil then return result == 1 end
+    end
+    return true
+end
+
+-- IsUsableSpell reports positional failures such as trying Backstab from the
+-- front. A lack of Energy is deliberately treated as usable because pooling is
+-- handled by the evaluator and should not change the recommended builder.
+function ns.IsAbilityUsable(key)
+    local ability = ns.ABILITIES[key]
+    if not ability then return false end
+    if C_Spell and C_Spell.IsSpellUsable then
+        local ok, usable, noEnergy = pcall(C_Spell.IsSpellUsable, ability.id)
+        if ok and usable ~= nil then
+            return usable == true or noEnergy == true
+        end
+    end
+    if IsUsableSpell then
+        local info = ns.GetSpellInfo(ability.id)
+        local usable, noEnergy = IsUsableSpell((info and info.name) or ability.id)
+        if usable ~= nil then
+            return usable == true or usable == 1
+                or noEnergy == true or noEnergy == 1
+        end
     end
     return true
 end
@@ -606,11 +692,17 @@ local function RefreshInsight(now)
     ns.state.insightRemaining = AuraRemaining(aura, now)
 end
 
-function ns.ResolveMode(requestedMode, enemyCount)
+function ns.ResolveMode(requestedMode, enemyCount, specID)
     if requestedMode == "single" then return "single" end
     if requestedMode == "cleave" then return "cleave" end
     if requestedMode == "aoe" then return "aoe" end
-    if enemyCount >= ns.CONFIG.AOE_THRESHOLD then return "aoe" end
+    local aoeThreshold = ns.CONFIG.AOE_THRESHOLD
+    if specID == ns.ASSASSINATION_SPEC_ID then
+        aoeThreshold = ns.CONFIG.ASSASSINATION_AOE_THRESHOLD or 4
+    elseif specID == ns.SUBTLETY_SPEC_ID then
+        aoeThreshold = ns.CONFIG.SUBTLETY_AOE_THRESHOLD or 3
+    end
+    if enemyCount >= aoeThreshold then return "aoe" end
     if enemyCount >= ns.CONFIG.CLEAVE_THRESHOLD then return "cleave" end
     return "single"
 end
@@ -624,7 +716,10 @@ function ns.RefreshState()
     local _, classFile = UnitClass("player")
     s.isRogue = classFile == ns.ROGUE_CLASS_FILE
     s.specID = GetSpecID()
+    s.isAssassinationSpec = s.isRogue and s.specID == ns.ASSASSINATION_SPEC_ID
     s.isCombatSpec = s.isRogue and s.specID == ns.COMBAT_SPEC_ID
+    s.isSubtletySpec = s.isRogue and s.specID == ns.SUBTLETY_SPEC_ID
+    s.isSupportedSpec = s.isRogue and ns.IsSupportedSpec(s.specID)
     s.inCombat = UnitAffectingCombat("player") == true
     s.inRaid = IsInRaid and IsInRaid() == true
     s.energy = UnitPower("player", ENERGY_POWER_TYPE) or 0
@@ -657,8 +752,10 @@ function ns.RefreshState()
     s.targetIsBoss = s.targetExists
         and (classification == "worldboss" or (UnitLevel("target") or 0) == -1)
     s.targetTTD = EstimateTargetTTD(s.targetGUID, s.targetHealth, now, s.targetIsBoss)
+    local meleeAbility = s.isAssassinationSpec and "MUTILATE"
+        or (s.isSubtletySpec and "BACKSTAB") or "SINISTER_STRIKE"
     s.meleeRange = s.targetAttackable
-        and ns.IsAbilityInRange("SINISTER_STRIKE", "target") or false
+        and ns.IsAbilityInRange(meleeAbility, "target") or false
     s.shurikenRange = s.targetAttackable
         and ns.IsAbilityInRange("SHURIKEN_TOSS", "target") or false
 
@@ -666,6 +763,15 @@ function ns.RefreshState()
     local snd = ns.FindAura("player", ns.AURAS.SLICE_AND_DICE, "HELPFUL")
     local rvs = ns.FindAura("target", ns.AURAS.REVEALING_STRIKE, "HARMFUL", true)
     local rupture = ns.FindAura("target", ns.AURAS.RUPTURE, "HARMFUL", true)
+    local hemorrhage = ns.FindAura("target", ns.AURAS.HEMORRHAGE, "HARMFUL", true)
+    local crimsonTempest = ns.FindAura("target", ns.AURAS.CRIMSON_TEMPEST,
+        "HARMFUL", true)
+    local findWeakness = ns.FindAura("target", ns.AURAS.FIND_WEAKNESS,
+        "HARMFUL", true)
+    local shadowDance = ns.FindAura("player", ns.AURAS.SHADOW_DANCE, "HELPFUL")
+    local envenom = ns.FindAura("player", ns.AURAS.ENVENOM, "HELPFUL")
+    local vendetta = ns.FindAura("target", ns.AURAS.VENDETTA, "HARMFUL", true)
+    local blindside = ns.FindAura("player", ns.AURAS.BLINDSIDE, "HELPFUL")
     local bladeFlurry = ns.FindAura("player", ns.AURAS.BLADE_FLURRY, "HELPFUL")
     local adrenalineRush = ns.FindAura("player", ns.AURAS.ADRENALINE_RUSH, "HELPFUL")
     local shadowBlades = ns.FindAura("player", ns.AURAS.SHADOW_BLADES, "HELPFUL")
@@ -698,16 +804,32 @@ function ns.RefreshState()
     s.sndRemaining = AuraRemaining(snd, now)
     s.rvsRemaining = AuraRemaining(rvs, now)
     s.ruptureRemaining = AuraRemaining(rupture, now)
+    s.hemorrhageRemaining = AuraRemaining(hemorrhage, now)
+    s.crimsonTempestRemaining = AuraRemaining(crimsonTempest, now)
+    s.findWeaknessRemaining = AuraRemaining(findWeakness, now)
+    s.shadowDanceRemaining = AuraRemaining(shadowDance, now)
+    s.envenomRemaining = AuraRemaining(envenom, now)
+    s.vendettaRemaining = AuraRemaining(vendetta, now)
+    s.blindside = blindside ~= nil
     s.bladeFlurry = bladeFlurry ~= nil
     s.adrenalineRush = adrenalineRush ~= nil
     s.shadowBlades = shadowBlades ~= nil
     s.killingSpree = killingSpree ~= nil
+    s.shadowDance = shadowDance ~= nil
+    s.backstabUsable = ns.IsAbilityUsable("BACKSTAB")
     s.kidneyShotRemaining = AuraRemaining(kidneyShot, now)
 
-    RefreshInsight(now)
+    if s.isCombatSpec then
+        RefreshInsight(now)
+    else
+        s.insight = 0
+        s.insightName = "None"
+        s.insightRemaining = 0
+        s.insightProgress = 0
+    end
     RefreshCooldowns()
     s.enemyCount = ns.CountNearbyEnemies()
-    s.mode = ns.ResolveMode(ns.db and ns.db.mode or "auto", s.enemyCount)
+    s.mode = ns.ResolveMode(ns.db and ns.db.mode or "auto", s.enemyCount, s.specID)
     return s
 end
 
@@ -725,6 +847,11 @@ local AREA_CAST_SPELLS = {
 }
 local NEARBY_DAMAGE_SPELLS = {
     [ns.ABILITIES.AMBUSH.id] = true,
+    [ns.ABILITIES.BACKSTAB.id] = true,
+    [ns.ABILITIES.HEMORRHAGE.id] = true,
+    [ns.ABILITIES.MUTILATE.id] = true,
+    [ns.ABILITIES.DISPATCH.id] = true,
+    [ns.ABILITIES.ENVENOM.id] = true,
     [ns.ABILITIES.REVEALING_STRIKE.id] = true,
     [ns.ABILITIES.SINISTER_STRIKE.id] = true,
     [ns.ABILITIES.EVISCERATE.id] = true,
@@ -926,6 +1053,7 @@ local function SlashHandler(text)
         if ns.Simulator_PrintSelfCheck then ns.Simulator_PrintSelfCheck() end
     elseif command == "status" then
         ns.Print("v" .. ns.VERSION .. ", level=" .. tostring(ns.state.playerLevel or 0)
+            .. ", spec=" .. ns.GetSpecName(ns.state.specID)
             .. ", mode=" .. ns.db.mode
             .. ", active=" .. tostring(ns.state.mode or "single")
             .. ", targets=" .. tostring(ns.state.enemyCount or 1)
@@ -982,8 +1110,13 @@ eventFrame:SetScript("OnEvent", function(_, event, ...)
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         HandleCombatLog()
     elseif event == "UNIT_SPELLCAST_SUCCEEDED" and arg1 == "player" then
-        local spellID = tonumber(select(3, ...)) or tonumber(select(5, ...))
-        MarkAreaCast(spellID)
+        -- MoP can emit this event without a spell payload for some casts.
+        -- Assign the varargs first so an absent value becomes nil instead of
+        -- expanding to zero arguments in tonumber(). The fifth argument keeps
+        -- compatibility with older UNIT_SPELLCAST_SUCCEEDED signatures.
+        local _, _, eventSpellID, _, legacySpellID = ...
+        local spellID = tonumber(eventSpellID) or tonumber(legacySpellID)
+        if spellID then MarkAreaCast(spellID) end
     elseif event == "SPELLS_CHANGED" or event == "PLAYER_SPECIALIZATION_CHANGED"
         or event == "PLAYER_TALENT_UPDATE" or event == "PLAYER_LEVEL_UP" then
         RefreshKnownAbilities()

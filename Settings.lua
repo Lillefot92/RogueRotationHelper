@@ -13,6 +13,8 @@ local trackingText
 local scaleSlider
 local scaleValueText
 local previewButton
+local advancedSectionLabel
+local vanishCheck
 local suppressScaleUpdate = false
 local refreshElapsed = 0
 local checkButtons = {}
@@ -143,16 +145,40 @@ function ns.Settings_Refresh()
     previewButton:SetText(ns.db.testMode and "Stop preview" or "Preview display")
 
     local state = ns.state
-    local specText = state.isCombatSpec and "Combat Rogue" or "Combat not active"
+    local specName = ns.GetSpecName(state.specID)
+    local specText
+    if state.isSupportedSpec then
+        specText = specName .. " Rogue"
+    elseif state.isRogue then
+        specText = specName .. " not yet supported"
+    else
+        specText = "Rogue not active"
+    end
     statusText:SetText(string.format("Level %d  |  %s  |  Addon %s",
         state.playerLevel or 0, specText, ns.db.enabled and "enabled" or "disabled"))
     talentText:SetText("Level 90 talent: " .. LevelNinetyTalent()
         .. "  |  Detected talents: " .. ns.GetTalentSummary())
 
     local enemies = state.enemyCount or 1
-    local resolved = ns.ResolveMode(ns.db.mode or "auto", enemies)
+    local resolved = ns.ResolveMode(ns.db.mode or "auto", enemies, state.specID)
     trackingText:SetText(string.format("Current tracking: %d nearby target%s  |  %s mode",
         enemies, enemies == 1 and "" or "s", resolved))
+
+    if advancedSectionLabel then
+        advancedSectionLabel:SetText(state.isSupportedSpec
+            and ("Advanced " .. specName .. " options") or "Advanced options")
+    end
+    if vanishCheck and vanishCheck.label then
+        if state.isSubtletySpec then
+            vanishCheck.label:SetText("Vanish is automatic in the core Subtlety rotation")
+            if vanishCheck.Disable then vanishCheck:Disable() end
+        else
+            vanishCheck.label:SetText(state.isAssassinationSpec
+                and "Suggest offensive Vanish during damage windows"
+                or "Suggest offensive Vanish during Deep Insight")
+            if vanishCheck.Enable then vanishCheck:Enable() end
+        end
+    end
 end
 
 local function ApplyDisplaySettings()
@@ -166,7 +192,7 @@ local function CreatePanel()
 
     CreateText(panel, "GameFontNormalHuge", "Rogue Rotation Helper", 20, -18,
         COLORS.teal)
-    CreateText(panel, "GameFontHighlight", "Combat PvE rotation advisor - settings save immediately",
+    CreateText(panel, "GameFontHighlight", "Rogue PvE rotation advisor - settings save immediately",
         22, -50, COLORS.muted)
     CreateText(panel, "GameFontDisableSmall", "Version " .. ns.VERSION, 590, -25,
         COLORS.muted)
@@ -254,9 +280,9 @@ local function CreatePanel()
         ApplyDisplaySettings()
     end)
 
-    CreateSection(panel, "Advanced Combat options", -458)
-    CreateCheck(panel, "offensiveVanish", "Suggest offensive Vanish during Deep Insight",
-        24, -493)
+    advancedSectionLabel = CreateSection(panel, "Advanced options", -458)
+    vanishCheck = CreateCheck(panel, "offensiveVanish",
+        "Suggest offensive Vanish during damage windows", 24, -493)
     CreateCheck(panel, "preyOnWeak", "Suggest Prey on the Weak on stunnable adds",
         365, -493)
     CreateText(panel, "GameFontDisableSmall",
