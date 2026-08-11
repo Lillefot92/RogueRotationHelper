@@ -1,5 +1,7 @@
 # Rogue Rotation Helper
 
+[![Validate addon](https://github.com/Lillefot92/RogueRotationHelper/actions/workflows/validate.yml/badge.svg)](https://github.com/Lillefot92/RogueRotationHelper/actions/workflows/validate.yml)
+
 <p align="center">
   <img src="docs/images/rogue-rotation-helper-logo.png" alt="Rogue Rotation Helper logo" width="220">
 </p>

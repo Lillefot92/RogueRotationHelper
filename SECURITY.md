@@ -48,5 +48,9 @@ Official source and releases are published at:
 - https://github.com/Lillefot92/RogueRotationHelper/releases
 
 Every public change has a visible commit history and reviewable diff. Report a
-suspected security problem through the repository issue tracker without
-including account credentials or other private information.
+suspected security problem privately through GitHub Security Advisories:
+
+https://github.com/Lillefot92/RogueRotationHelper/security/advisories/new
+
+Do not publish vulnerability details in the public issue tracker, and never
+include account credentials, private chat, or other personal information.

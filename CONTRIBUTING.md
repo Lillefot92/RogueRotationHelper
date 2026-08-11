@@ -27,3 +27,17 @@ especially useful.
 
 Open feedback at:
 https://github.com/Lillefot92/RogueRotationHelper/issues
+
+## Development safeguards
+
+Submit code changes through a pull request. Before requesting review, run:
+
+```text
+python3 tests/validate_repository.py
+lua5.1 tests/run_simulator.lua
+python3 tools/build_release.py
+```
+
+GitHub repeats these checks automatically. Release archives are generated only
+from the explicit allowlist in `tools/build_release.py`; generated `dist/`
+files must not be committed.
