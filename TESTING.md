@@ -20,7 +20,8 @@ This build targets official MoP Classic 5.5.4 / Interface 50504.
    the same panel opened by `/rrh`.
 2. Change target mode and cooldown usage; confirm the selected buttons update
    immediately.
-3. Toggle side cooldown icons, action-bar glow, and display locking.
+3. Toggle side cooldown icons, attached Combo Points, action-bar glow, and
+   display locking.
 4. Move the scale slider and confirm the main icon changes size immediately.
 5. Use **Preview display**, **Reset position**, and **Run rotation check**.
 6. Reload the UI and confirm the chosen settings were saved.
@@ -88,17 +89,24 @@ This build targets official MoP Classic 5.5.4 / Interface 50504.
 
 ### Compact display
 
-1. Confirm the main window contains only the large recommendation icon during
-   normal play.
+1. Confirm the main window contains the large recommendation icon with the
+   attached Combo Point row beneath it when enabled.
 2. Confirm all three learned major cooldowns—including Shadow Blades—appear as
    larger icons stacked on its right at level 90.
-3. Mouse over the main icon and confirm the reason, mode/target count, Energy,
+3. Build from zero to five Combo Points and confirm the five teal pips update
+   immediately without moving the rotation display.
+4. With Anticipation selected, build stored charges and confirm the thinner
+   purple row displays up to five additional charges. Spend the points and
+   confirm both rows update correctly.
+5. Disable **Show Combo Points** in `/rrh`, confirm both rows disappear, then
+   enable it again and confirm the setting survives `/reload`.
+6. Mouse over the main icon and confirm the reason, mode/target count, Energy,
    Combo Points, key timers, and poison state are available in the tooltip.
-4. Confirm a gold border/icon means pool, red means range or poison attention,
+7. Confirm a gold border/icon means pool, red means range or poison attention,
    and teal means the recommendation is ready.
-5. While pooling, confirm the required Energy number appears at the lower-right
+8. While pooling, confirm the required Energy number appears at the lower-right
    of the main icon and disappears immediately when the icon becomes ready.
-6. Hover the recommendation icon, then hover bag items, equipped gear, spells,
+9. Hover the recommendation icon, then hover bag items, equipped gear, spells,
    and action buttons. Confirm their normal tooltips remain visible and are not
    replaced or hidden by the addon.
 

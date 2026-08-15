@@ -8,7 +8,7 @@
 
 local ADDON_NAME, ns = ...
 
-ns.VERSION = "1.0.0-beta.1"
+ns.VERSION = "1.0.0-beta.2"
 ns.INTERFACE = 50504
 ns.ROGUE_CLASS_FILE = "ROGUE"
 ns.ASSASSINATION_SPEC_ID = 259
@@ -247,6 +247,7 @@ local function InitDB()
     if db.mode == nil then db.mode = "auto" end
     if db.cooldowns == nil then db.cooldowns = "boss" end
     if db.showCooldownRow == nil then db.showCooldownRow = true end
+    if db.showComboPoints == nil then db.showComboPoints = true end
     if db.offensiveVanish == nil then db.offensiveVanish = false end
     if db.preyOnWeak == nil then db.preyOnWeak = false end
     if db.testMode == nil then db.testMode = false end

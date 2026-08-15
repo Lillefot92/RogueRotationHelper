@@ -36,5 +36,8 @@ jobs:
       - name: Run all rotation scenarios
         run: lua5.1 tests/run_simulator.lua
 
+      - name: Run display scenarios
+        run: lua5.1 tests/run_display.lua
+
       - name: Verify release packaging
         run: python3 tools/build_release.py --output dist
