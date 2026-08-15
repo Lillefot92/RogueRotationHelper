@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0-beta.2
+
+- Added an optional Combo Point display attached beneath the main rotation
+  icon, with five teal pips for normal points.
+- Added a second, thinner purple row for up to five stored Anticipation
+  charges, shown automatically when Anticipation is selected.
+- Added a **Show Combo Points** option to the in-game settings panel; it is
+  enabled by default and saved between sessions.
+- Kept all Combat, Assassination, and Subtlety rotation priorities unchanged.
+
 ## 1.0.0-beta.1
 
 - Promoted Combat, Assassination, and Subtlety to one public beta after live

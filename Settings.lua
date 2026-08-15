@@ -252,14 +252,16 @@ local function CreatePanel()
             if not enabled and ns.Display_HideGlow then ns.Display_HideGlow() end
         end)
     CreateCheck(panel, "showCooldownRow", "Show side cooldown icons", 500, -365)
-    CreateCheck(panel, "locked", "Lock display position", 24, -402,
+    CreateCheck(panel, "locked", "Lock position", 24, -402,
+        ApplyDisplaySettings)
+    CreateCheck(panel, "showComboPoints", "Show Combo Points", 158, -402,
         ApplyDisplaySettings)
 
-    CreateText(panel, "GameFontHighlight", "Display scale", 244, -407)
+    CreateText(panel, "GameFontHighlight", "Display scale", 345, -407)
     scaleSlider = CreateFrame("Slider", "RogueRotationHelperScaleSlider", panel,
         "OptionsSliderTemplate")
-    scaleSlider:SetPoint("TOPLEFT", panel, "TOPLEFT", 350, -397)
-    scaleSlider:SetSize(220, 18)
+    scaleSlider:SetPoint("TOPLEFT", panel, "TOPLEFT", 445, -397)
+    scaleSlider:SetSize(145, 18)
     scaleSlider:SetMinMaxValues(0.5, 2.0)
     scaleSlider:SetValueStep(0.05)
     scaleSlider:SetObeyStepOnDrag(true)

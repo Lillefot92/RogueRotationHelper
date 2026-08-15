@@ -539,6 +539,7 @@ function ns.Simulator_GetPreview()
     state.targetIsBoss = true
     state.energy = 46
     state.comboPoints = 5
+    state.anticipation = 2
     state.enemyCount = 1
     state.insight = 3
     state.insightName = "Deep"

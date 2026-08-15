@@ -44,8 +44,9 @@ report and its eventual fix remain visible to everyone.
 
 ## What the Combat beta includes
 
-- A clean, large next-action icon; mouse over it for the recommendation reason
-  and detailed state.
+- A clean, large next-action icon with an optional attached five-point Combo
+  Point row and purple Anticipation-charge row; mouse over it for the
+  recommendation reason and detailed state.
 - Energy pooling with a compact target number, plus out-of-range warnings.
 - Energy, Combo Points, Slice and Dice, Revealing Strike, Rupture, target mode,
   target count, and poison status in the mouseover tooltip.
@@ -246,7 +247,8 @@ Open **Escape > Options > AddOns > Rogue Rotation Helper**, or simply enter
 
 - Automatic, single-target, cleave, and AoE modes.
 - Boss-only, always, or disabled offensive cooldown usage.
-- Addon enablement, action-bar glow, and side cooldown-icon toggles.
+- Addon enablement, action-bar glow, side cooldown-icon, and attached Combo
+  Point toggles.
 - Display locking, scaling, preview, and position reset.
 - Optional offensive Vanish and Prey on the Weak advice.
 - Level/spec, level-90 talent, detected talents, nearby-target count, and active

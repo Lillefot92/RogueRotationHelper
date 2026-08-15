@@ -9,6 +9,9 @@ local frame
 local iconTexture
 local primaryCooldown
 local poolEnergyText
+local comboPointFrame
+local comboPointPips = {}
+local anticipationPips = {}
 local unlockedText
 local cooldownEntries = {}
 local actionButtons = {}
@@ -26,6 +29,9 @@ local COLORS = {
     pool = { 1.00, 0.66, 0.20, 1.00 },
     danger = { 1.00, 0.24, 0.20, 1.00 },
     unlocked = { 1.00, 0.55, 0.12, 1.00 },
+    combo = { 0.17, 0.82, 0.74, 1.00 },
+    anticipation = { 0.70, 0.38, 1.00, 1.00 },
+    pipEmpty = { 0.055, 0.075, 0.105, 0.94 },
 }
 
 local function BackdropTemplate()
@@ -81,6 +87,49 @@ local function CreateCooldownEntry(parent, key)
     entry.key = key
     cooldownEntries[#cooldownEntries + 1] = entry
     return entry
+end
+
+local function CreateResourcePip(parent, width, height, x, y)
+    local pip = CreateFrame("Frame", nil, parent, BackdropTemplate())
+    pip:SetSize(width, height)
+    pip:SetPoint("TOPLEFT", parent, "TOPLEFT", x, y)
+    if pip.SetBackdrop then
+        pip:SetBackdrop({
+            bgFile = "Interface\\Buttons\\WHITE8X8",
+            edgeFile = "Interface\\Buttons\\WHITE8X8",
+            edgeSize = 1,
+        })
+    end
+    return pip
+end
+
+local function SetResourcePip(pip, active, color)
+    if not pip or not pip.SetBackdropColor then return end
+    if active then
+        pip:SetBackdropColor(color[1], color[2], color[3], color[4])
+        pip:SetBackdropBorderColor(0.82, 0.94, 1.00, 1.00)
+    else
+        pip:SetBackdropColor(COLORS.pipEmpty[1], COLORS.pipEmpty[2],
+            COLORS.pipEmpty[3], COLORS.pipEmpty[4])
+        pip:SetBackdropBorderColor(COLORS.inactive[1], COLORS.inactive[2],
+            COLORS.inactive[3], COLORS.inactive[4])
+    end
+end
+
+local function CreateComboPointDisplay(parent)
+    comboPointFrame = CreateFrame("Frame", nil, parent)
+    comboPointFrame:SetSize(92, 18)
+    comboPointFrame:SetPoint("TOP", parent, "BOTTOM", 0, -4)
+
+    for index = 1, 5 do
+        local x = 5 + ((index - 1) * 17)
+        comboPointPips[index] = CreateResourcePip(comboPointFrame, 14, 7, x, 0)
+        anticipationPips[index] = CreateResourcePip(comboPointFrame, 14, 4, x, -10)
+    end
+
+    parent.comboPointFrame = comboPointFrame
+    parent.comboPointPips = comboPointPips
+    parent.anticipationPips = anticipationPips
 end
 
 local function ModeLabel(state)
@@ -232,6 +281,8 @@ function ns.Display_Create()
     poolEnergyText:Hide()
     frame.poolEnergyText = poolEnergyText
 
+    CreateComboPointDisplay(frame)
+
     unlockedText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     unlockedText:SetPoint("BOTTOM", frame, "TOP", 0, 4)
     unlockedText:SetText("DRAG")
@@ -274,6 +325,7 @@ function ns.Display_ApplySettings()
         ns.db.x or 0, ns.db.y or 220)
     frame:SetScale(ns.db.scale or 1)
     unlockedText:SetShown(not ns.db.locked)
+    comboPointFrame:SetShown(ns.db.showComboPoints ~= false)
     if not ns.db.locked then SetBorder(frame, COLORS.unlocked) end
 end
 
@@ -393,6 +445,25 @@ local function UpdateCooldownColumn(state, preview)
     end
 end
 
+local function UpdateComboPointDisplay(state)
+    if not comboPointFrame then return end
+    local show = ns.db.showComboPoints ~= false
+    comboPointFrame:SetShown(show)
+    if not show then return end
+
+    local comboPoints = math.max(0, math.min(5, state.comboPoints or 0))
+    local anticipation = math.max(0, math.min(5, state.anticipation or 0))
+    local hasAnticipation = anticipation > 0
+        or (state.talents and state.talents.ANTICIPATION == true) or false
+
+    for index = 1, 5 do
+        SetResourcePip(comboPointPips[index], index <= comboPoints, COLORS.combo)
+        SetResourcePip(anticipationPips[index], index <= anticipation,
+            COLORS.anticipation)
+        anticipationPips[index]:SetShown(hasAnticipation)
+    end
+end
+
 local function UpdatePrimaryAppearance(decision)
     local color = COLORS.ready
     local poolThreshold = decision.poolTo or decision.cost or 0
@@ -466,6 +537,7 @@ function ns.Display_Update(liveState, liveDecision)
     end
 
     UpdateCooldownColumn(state, preview)
+    UpdateComboPointDisplay(state)
     UpdateGlow(decision, preview)
     if tooltipVisible and GetTime() - tooltipLastRefresh >= 0.20 then
         if TooltipIsOwnedBy(frame) then
