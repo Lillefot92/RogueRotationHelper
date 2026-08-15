@@ -1,4 +1,4 @@
-# Combat beta, Assassination alpha, and Subtlety alpha test pass
+# Combat, Assassination, and Subtlety beta test pass
 
 This build targets official MoP Classic 5.5.4 / Interface 50504.
 
@@ -102,12 +102,13 @@ This build targets official MoP Classic 5.5.4 / Interface 50504.
    and action buttons. Confirm their normal tooltips remain visible and are not
    replaced or hidden by the addon.
 
-## Assassination alpha checks
+## Assassination beta checks
 
-Live validation completed for level-90 single target, Blindside and execute
-Dispatch, pooled Envenom, four-plus-target Fan of Knives/Rupture behavior,
-automatic mode changes, tooltip safety, and switching back to Combat without a
-UI reload. Nine-or-more targets and dungeon/raid behavior remain open checks.
+Live validation completed for level-90 single target and cleave, Blindside and
+execute Dispatch, pooled Envenom, four-plus-target Fan of Knives/Rupture
+behavior, automatic mode changes, tooltip safety, and switching back to Combat
+without a UI reload. Nine-or-more targets and broader dungeon/raid behavior
+remain open beta checks.
 
 ### Specialization switching and display
 
@@ -159,13 +160,13 @@ UI reload. Nine-or-more targets and dungeon/raid behavior remain open checks.
 3. Repeat a short single-target sequence and confirm Revealing Strike remains
    the normal builder and no Assassination-only spell is recommended.
 
-## Subtlety alpha checks
+## Subtlety beta checks
 
-Focused level-90 live validation has passed for the opener and maintenance
-cycle, 80-Energy Shadow Dance and Vanish pooling, Find Weakness windows,
-Preparation ordering, AoE recommendations, cooldown display, and live
-specialization switching. Dungeon and raid behavior remains open for external
-testing.
+Focused level-90 live validation has passed for single target and cleave, the
+opener and maintenance cycle, 80-Energy Shadow Dance and Vanish pooling, Find
+Weakness windows, Preparation ordering, AoE recommendations, cooldown display,
+and live specialization switching. Broader dungeon and raid behavior remains
+open for beta testing.
 
 ### Specialization switching and display
 
@@ -229,12 +230,12 @@ testing.
 - Treat every Killing Spree recommendation as conditional on safe positioning.
 - Watch for display flicker, stale auras after target swaps, wrong range state,
   or an action-bar glow that remains after combat.
-- Assassination has passed its first live dummy and specialization-switching
-  pass. Use external-alpha feedback to validate nine-or-more targets and live
-  dungeon/raid behavior.
-- Subtlety has passed its focused live dummy and AoE passes. Use external-alpha
-  feedback to validate real dungeon/raid packs, target-count transitions, and
-  encounter-specific burst timing.
+- Assassination has passed live single-target, cleave, dummy, and
+  specialization-switching checks. Beta feedback should continue to validate
+  nine-or-more targets and live dungeon/raid behavior.
+- Subtlety has passed live single-target, cleave, dummy, and AoE checks. Beta
+  feedback should continue to validate real dungeon/raid packs, target-count
+  transitions, and encounter-specific burst timing.
 
 ## Useful feedback
 

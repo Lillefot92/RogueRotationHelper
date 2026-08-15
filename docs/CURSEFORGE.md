@@ -25,11 +25,11 @@ targets an enemy, sends chat, downloads code, or automates gameplay.
 
 - **Combat — beta:** validated on level-90 single-target dummies and live
   dungeon pulls, including automatic AoE-to-cleave transitions.
-- **Assassination — external alpha:** focused live dummy, execute, four-plus
-  target, pooling, and specialization-switching checks passed.
-- **Subtlety — external alpha:** focused live opener, maintenance, Shadow
-  Dance/Vanish pooling, Find Weakness, Preparation, AoE, and switching checks
-  passed.
+- **Assassination — beta:** live level-90 single-target and cleave testing
+  passed, along with execute, pooling, AoE, and specialization-switching checks.
+- **Subtlety — beta:** live level-90 single-target and cleave testing passed,
+  along with opener, maintenance, Shadow Dance/Vanish pooling, Find Weakness,
+  Preparation, AoE, and switching checks.
 
 ### Main features
 
@@ -61,13 +61,13 @@ Source code, commit history, releases, and issue reports are public:
   modes are available for planned pulls.
 - Killing Spree positioning and encounter-specific cooldown holds always
   require player judgment.
-- Assassination and Subtlety need more dungeon and raid feedback before their
-  alpha labels are removed.
+- Broader dungeon, raid, and real-pack/mass-AoE feedback remains welcome for
+  all three beta specializations.
 
 ## First file
 
-- Display name: `Rogue Rotation Helper 0.3.0-beta.2`
-- File: `RogueRotationHelper-0.3.0-beta.2.zip`
+- Display name: `Rogue Rotation Helper 1.0.0-beta.1`
+- File: `RogueRotationHelper-1.0.0-beta.1.zip`
 - Release type: `Beta`
 - Supported game version: `5.5.4`
 - Flavor: `MoP Classic`
@@ -75,11 +75,12 @@ Source code, commit history, releases, and issue reports are public:
 
 ## File changelog
 
-- Fixed a Lua error caused by incomplete `UNIT_SPELLCAST_SUCCEEDED` events.
-- Safely ignores spellcast notifications that contain no spell ID while
-  retaining modern and legacy event-signature support.
-- Includes the same Combat beta plus Assassination and Subtlety external alphas
-  as `0.3.0-beta.1` with no rotation-priority changes.
+- Promotes Combat, Assassination, and Subtlety to one public beta after live
+  level-90 single-target and cleave testing passed for all three.
+- Retains the tested specialization switching, compact display, Energy
+  pooling, poison warnings, cooldown policies, and talent-aware priorities.
+- Keeps raid-boss timing and broader real-pack/mass-AoE behavior documented as
+  open beta validation items.
 - Passed all 112 deterministic rotation scenarios.
 - See the public `CHANGELOG.md` for the complete version history.
 
