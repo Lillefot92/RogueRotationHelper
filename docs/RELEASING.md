@@ -7,8 +7,8 @@ is enabled.
 2. Confirm the version in `RogueRotationHelper.toc`, `Core.lua`, and the
    changelog matches the planned tag.
 3. Wait for the required `Repository and rotation checks` result to pass.
-4. Run `python3 tools/build_release.py`. This creates an allowlisted ZIP and a
-   matching `.sha256` sidecar in `dist/`.
+4. Run `python3 tools/build_release.py`. This creates an allowlisted,
+   line-ending-normalized ZIP and a matching `.sha256` sidecar in `dist/`.
 5. Create a draft GitHub release with a new `v<version>` tag targeting the
    tested commit on `main`.
 6. Attach both files from `dist/` and finish the release notes while the

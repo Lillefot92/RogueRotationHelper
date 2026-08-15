@@ -56,7 +56,7 @@ def build(output: Path) -> tuple[Path, Path, str]:
         for relative in relative_files:
             source = ROOT / relative
             data = source.read_bytes()
-            if source.suffix.lower() in {".lua", ".md", ".toc"} or source.name == "LICENSE":
+            if source.suffix.lower() in {".lua", ".md", ".toc", ".sha256"} or source.name == "LICENSE":
                 data = data.replace(b"\r\n", b"\n")
             member = zipfile.ZipInfo(
                 f"RogueRotationHelper/{relative}", date_time=FIXED_ZIP_TIME

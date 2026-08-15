@@ -10,6 +10,8 @@
   recommendations from the unified beta series.
 - Kept raid-boss cooldown timing, encounter-specific holds, and broader
   real-pack/mass-AoE behavior as clearly documented beta validation items.
+- Normalized the bundled checksum manifest so Windows and Linux create the
+  same release ZIP bytes.
 - Passed the repository safety checks and all 112 deterministic rotation
   scenarios before packaging.
 
