@@ -8,29 +8,25 @@
 
 Rogue Rotation Helper is a transparent, recommendation-only PvE addon for
 Rogues in **World of Warcraft: Mists of Pandaria Classic**. It targets the
-official **5.5.4 client (Interface 50504)** and currently supports **Combat**
-in public beta plus **Assassination** and **Subtlety** as external alphas.
+official **5.5.4 client (Interface 50504)** and supports **Combat**,
+**Assassination**, and **Subtlety** in public beta.
 
 The addon shows what to press next. It never casts a spell, presses a key,
 targets a unit, sends chat, or automates gameplay.
 
 ## Download the public beta
 
-Download `RogueRotationHelper-0.3.0-beta.2.zip` from the official
+Download `RogueRotationHelper-1.0.0-beta.1.zip` from the official
 [GitHub Releases page](https://github.com/Lillefot92/RogueRotationHelper/releases).
 The release ZIP contains only readable Lua source and documentation. Do not
 install similarly named executables or third-party installers.
 
-Combat has passed level-90 single-target dummy and live dungeon testing. The
-remaining beta item is boss-specific cooldown validation on a live raid boss;
-it is not required for general dungeon and dummy feedback.
-
-Version `0.3.0-beta.2` fixes an incomplete spellcast-event Lua error in the
-unified Combat, Assassination, and Subtlety testing build. Combat remains the
-most validated specialization.
-Assassination and Subtlety have passed their focused level-90 live dummy,
-display, pooling, AoE, and specialization-switching checks and remain clearly
-labelled as external alphas while dungeon and raid feedback is collected.
+Version `1.0.0-beta.1` promotes all three Rogue specializations to public beta
+after live level-90 single-target and cleave testing passed for Combat,
+Assassination, and Subtlety. Focused display, Energy-pooling, AoE,
+specialization-switching, execute, and cooldown checks have also passed where
+applicable. Raid-boss cooldown timing and broader real-pack/mass-AoE behavior
+remain open beta validation items.
 
 Found a problem? Use the public
 [issue tracker](https://github.com/Lillefot92/RogueRotationHelper/issues) so the
@@ -74,7 +70,7 @@ report and its eventual fix remain visible to everyone.
   choices, Deadly Throw while disconnected, talented poisons, and optional
   Prey on the Weak advice for stunnable enemies.
 
-## What the Assassination alpha includes
+## What the Assassination beta includes
 
 - Automatic specialization detection and a separate Assassination evaluator;
   switching specs does not require reloading or changing a setting.
@@ -90,7 +86,7 @@ report and its eventual fix remain visible to everyone.
 - Shared poison, range, target-counting, talent, action-bar glow, and settings
   support from the Combat beta.
 
-## What the Subtlety alpha includes
+## What the Subtlety beta includes
 
 - Premeditation into Slice and Dice setup, Ambush stealth windows, Backstab,
   Hemorrhage, five-point Rupture, and Eviscerate priorities.
@@ -159,7 +155,7 @@ open-source WoWSims MoP Combat Rogue implementation/APL:
 - https://github.com/wowsims/mop/tree/master/sim/rogue/combat
 - https://github.com/wowsims/mop/blob/master/ui/rogue/combat/apls/combat.apl.json
 
-## Assassination alpha rotation model
+## Assassination beta rotation model
 
 1. Apply Deadly Poison and the selected non-lethal poison before combat.
 2. Open with Mutilate from Stealth.
@@ -177,13 +173,13 @@ open-source WoWSims MoP Combat Rogue implementation/APL:
 10. At nine or more targets, build with Fan of Knives and spend on Envenom so
     Deadly Poison supplies most of the AoE damage.
 
-The alpha is cross-checked against the current Phase 5 guide and the open-source
+The beta is cross-checked against the current Phase 5 guide and the open-source
 WoWSims MoP Assassination APL:
 
 - https://www.wowhead.com/mop-classic/guide/classes/rogue/assassination/dps-rotation-cooldowns-abilities-pve
 - https://github.com/wowsims/mop/blob/master/ui/rogue/assassination/apls/assassination.apl.json
 
-## Subtlety alpha rotation model
+## Subtlety beta rotation model
 
 1. Apply poisons, use Premeditation from Stealth, and establish Slice and Dice.
 2. Open with Ambush to create a Find Weakness window.
@@ -201,7 +197,7 @@ WoWSims MoP Assassination APL:
    Ambush during Dance. At five or more targets, use Fan even during Dance.
 9. Maintain a five-point Crimson Tempest in AoE before spending on Eviscerate.
 
-The alpha is cross-checked against the current Phase 5 guide, WoWSims source,
+The beta is cross-checked against the current Phase 5 guide, WoWSims source,
 and its Subtlety APL:
 
 - https://www.wowhead.com/mop-classic/guide/classes/rogue/subtlety/dps-rotation-cooldowns-abilities-pve
@@ -269,6 +265,8 @@ complete verification and reuse terms.
 
 - Combat has passed level-90 single-target dummy and live dungeon validation,
   including an automatic transition from 18-target AoE to 5-target cleave.
+- Assassination and Subtlety have passed live level-90 single-target and cleave
+  validation, including specialization switching and their distinct displays.
 - Boss-specific cooldown timing still needs a live raid-boss validation pass
   before the first stable release.
 - Automatic enemy counting cannot see every unengaged or hidden enemy. Use a
@@ -279,16 +277,16 @@ complete verification and reuse terms.
   builder hits and can briefly desynchronize after reloads or unusual events.
 - Encounter-specific cooldown holds and defensive/utility prompts are not yet
   included.
-- Assassination has passed level-90 single-target, execute, four-to-eight
-  target, automatic-mode, and specialization-switching checks. Nine-or-more
-  targets and dungeon/raid behavior remain external-alpha validation items.
+- Assassination has also passed execute, four-to-eight-target,
+  automatic-mode, and specialization-switching checks. Nine-or-more targets
+  and broader dungeon/raid behavior remain beta validation items.
 - The addon sees Rupture only on the current target. It can explain when to
   spread Rupture but cannot select or identify the next unruptured enemy.
 - Subtlety has passed focused level-90 live checks for its opener,
   Backstab/Hemorrhage maintenance, Shadow Dance and Vanish pooling, Find
   Weakness windows, Preparation ordering, AoE recommendations, cooldown
-  display, and live specialization switching. Dungeon and raid behavior,
-  including automatic target-count transitions on real packs, remains an
-  external-alpha validation item.
+  display, and live specialization switching. Broader dungeon and raid
+  behavior, including automatic target-count transitions on real packs,
+  remains a beta validation item.
 
-See `TESTING.md` for the remaining Combat checks and both alpha test passes.
+See `TESTING.md` for the completed checks and remaining broader beta validation.

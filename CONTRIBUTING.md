@@ -1,8 +1,9 @@
 # Contributing and beta feedback
 
-Thank you for helping test Rogue Rotation Helper. The public beta focuses on
-level-90 Combat Rogue PvE and also contains external Assassination and
-Subtlety alphas for Mists of Pandaria Classic 5.5.4.
+Thank you for helping test Rogue Rotation Helper. The public beta supports
+level-90 Combat, Assassination, and Subtlety Rogue PvE for Mists of Pandaria
+Classic 5.5.4. All three specializations have passed live single-target and
+cleave testing; broader raid and mass-AoE feedback remains especially useful.
 
 ## Before reporting a rotation problem
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.0-beta.1
+
+- Promoted Combat, Assassination, and Subtlety to one public beta after live
+  level-90 single-target and cleave testing passed for all three
+  specializations.
+- Retained the validated specialization switching, compact display, Energy
+  pooling, poison warnings, cooldown policies, target modes, and talent-aware
+  recommendations from the unified beta series.
+- Kept raid-boss cooldown timing, encounter-specific holds, and broader
+  real-pack/mass-AoE behavior as clearly documented beta validation items.
+- Passed the repository safety checks and all 112 deterministic rotation
+  scenarios before packaging.
+
 ## 0.3.0-beta.2
 
 - Fixed a Lua error when Mists of Pandaria Classic fires
